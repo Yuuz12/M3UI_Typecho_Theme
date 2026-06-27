@@ -20,9 +20,6 @@ class BangumiAPI
     /** @var int 缓存有效期（秒），默认 6 小时 */
     private $cacheTTL = 21600;
 
-    /** @var string App ID */
-    private $appId = '';
-
     /** @var string API 基础地址 */
     private $apiBase = 'https://api.bgm.tv';
 
@@ -114,6 +111,24 @@ class BangumiAPI
     }
 
     /**
+     * 由放送日期推算星期（v0 API 不再返回 air_weekday 字段）
+     */
+    private function getWeekday($date)
+    {
+        if (empty($date)) {
+            return '';
+        }
+        $ts = strtotime($date);
+        if ($ts === false) {
+            return '';
+        }
+        $weekdays = array('周一', '周二', '周三', '周四', '周五', '周六', '周日');
+        // ISO-8601: 1=周一，7=周日
+        $w = (int) date('N', $ts);
+        return isset($weekdays[$w - 1]) ? $weekdays[$w - 1] : '';
+    }
+
+    /**
      * 获取在看番剧列表
      */
     public function getWatching()
@@ -125,7 +140,8 @@ class BangumiAPI
             return $cache['data'];
         }
 
-        $url = $this->apiBase . '/user/' . $this->userID . '/collection?cat=playing';
+        // v0 API：subject_type=2 动画，type=3 在看
+        $url = $this->apiBase . '/v0/users/' . $this->userID . '/collections?subject_type=2&type=3&limit=50&offset=0';
         $raw = $this->curlGet($url);
 
         if ($raw === false || $raw === 'null' || $raw === '') {
@@ -133,30 +149,28 @@ class BangumiAPI
         }
 
         $data = json_decode($raw, true);
-        if (!is_array($data)) {
+        if (!is_array($data) || !isset($data['data']) || !is_array($data['data'])) {
             return array();
         }
 
-        $weekdays = array('周一', '周二', '周三', '周四', '周五', '周六', '周日');
         $result = array();
 
-        foreach ($data as $item) {
-            if (!isset($item['subject'])) continue;
+        foreach ($data['data'] as $item) {
+            $subject = $item['subject'] ?? array();
+            $date = $subject['date'] ?? '';
 
-            $subject = $item['subject'];
             $result[] = array(
                 'name' => $subject['name'] ?? '',
                 'name_cn' => $subject['name_cn'] ?? $subject['name'] ?? '',
                 'url' => 'https://bgm.tv/subject/' . ($subject['id'] ?? ''),
                 'ep_status' => $item['ep_status'] ?? 0,
-                'eps_count' => $subject['eps_count'] ?? 0,
-                'air_date' => $subject['air_date'] ?? '',
-                'air_weekday' => isset($subject['air_weekday']) && $subject['air_weekday'] >= 1 && $subject['air_weekday'] <= 7
-                    ? $weekdays[$subject['air_weekday'] - 1] : '',
+                'eps_count' => $subject['eps'] ?? ($subject['total_episodes'] ?? 0),
+                'air_date' => $date,
+                'air_weekday' => $this->getWeekday($date),
                 'img' => $this->replaceImgUrl(isset($subject['images']['large'])
                     ? str_replace('http://', 'https://', $subject['images']['large']) : ''),
                 'id' => $subject['id'] ?? 0,
-                'summary' => $subject['summary'] ?? '',
+                'summary' => $subject['short_summary'] ?? ($subject['summary'] ?? ''),
             );
         }
 
@@ -179,28 +193,28 @@ class BangumiAPI
             return $cache['data'];
         }
 
-        $url = $this->apiBase . '/user/' . $this->userID . '/collections/anime?app_id=' . $this->appId . '&max_results=25';
-        $raw = $this->curlGet($url);
-
-        if ($raw === false || $raw === 'null' || $raw === '') {
-            return array();
-        }
-
-        $data = json_decode($raw, true);
-        if (!is_array($data) || !isset($data[0]['collects'])) {
-            return array();
-        }
-
+        // v0 API：subject_type=2 动画，type=2 看过；分页拉取全部
         $result = array();
+        $limit = 50;
+        $offset = 0;
+        $maxPages = 20; // 安全上限，约 1000 条
 
-        foreach ($data[0]['collects'] as $collect) {
-            if (!isset($collect['status']['id']) || $collect['status']['id'] != 2) continue;
-            if (!isset($collect['list'])) continue;
+        while ($maxPages-- > 0) {
+            $url = $this->apiBase . '/v0/users/' . $this->userID . '/collections?subject_type=2&type=2&limit=' . $limit . '&offset=' . $offset;
+            $raw = $this->curlGet($url);
 
-            foreach ($collect['list'] as $item) {
-                if (!isset($item['subject'])) continue;
+            if ($raw === false || $raw === 'null' || $raw === '') {
+                break;
+            }
 
-                $subject = $item['subject'];
+            $data = json_decode($raw, true);
+            if (!is_array($data) || !isset($data['data']) || !is_array($data['data'])) {
+                break;
+            }
+
+            foreach ($data['data'] as $item) {
+                $subject = $item['subject'] ?? array();
+
                 $result[] = array(
                     'name' => $subject['name'] ?? '',
                     'name_cn' => $subject['name_cn'] ?? $subject['name'] ?? '',
@@ -209,6 +223,12 @@ class BangumiAPI
                         ? str_replace('http://', 'https://', $subject['images']['large']) : ''),
                     'id' => $subject['id'] ?? 0,
                 );
+            }
+
+            $returned = count($data['data']);
+            $offset += $returned;
+            if ($returned < $limit) {
+                break;
             }
         }
 
@@ -325,6 +345,24 @@ $this->need('header.php');
 /* ===== 加载中 ===== */
 .bangumi-loading {
     padding: 32px 16px;
+}
+
+/* ===== 分页 ===== */
+.bangumi-page-nav {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.bangumi-page-nav .bangumi-page-info {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+    white-space: nowrap;
 }
 
 /* ===== 番剧网格 ===== */

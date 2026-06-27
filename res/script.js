@@ -767,11 +767,112 @@ function initBangumi() {
         return div.innerHTML;
     }
 
+    // ===== 番组分页（每页 30 条）=====
+    var BANGUMI_PAGE_SIZE = 30;
+    var watchingData = [];
+    var watchedData = [];
+    var watchingPage = 1;
+    var watchedPage = 1;
+
+    function buildWatchingCard(item) {
+        var subtitle = item.name && item.name !== item.name_cn
+            ? '<p class="bangumi-subtitle">' + escapeHtml(item.name) + '</p>' : '';
+        var chips = '';
+        if (item.eps_count > 0) {
+            chips += '<mdui-chip icon="movie" disabled elevated>' + item.ep_status + ' / ' + item.eps_count + '</mdui-chip>';
+        }
+        if (item.air_weekday) {
+            chips += '<mdui-chip icon="schedule" disabled elevated>' + escapeHtml(item.air_weekday) + '</mdui-chip>';
+        }
+        if (item.air_date) {
+            chips += '<mdui-chip icon="event" disabled elevated>' + escapeHtml(item.air_date) + '</mdui-chip>';
+        }
+        var progress = item.eps_count > 0
+            ? '<div class="bangumi-progress-wrapper"><mdui-linear-progress value="' + item.ep_status + '" max="' + item.eps_count + '"></mdui-linear-progress></div>' : '';
+
+        return '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
+            '<mdui-card variant="elevated" class="bangumi-card">' +
+            '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
+            '<div class="bangumi-info">' +
+            '<h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3>' +
+            subtitle +
+            '<div class="bangumi-meta">' + chips + '</div>' +
+            progress +
+            '</div></mdui-card></a>';
+    }
+
+    function buildWatchedCard(item) {
+        return '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
+            '<mdui-card variant="elevated" class="bangumi-card-mini">' +
+            '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
+            '<div class="bangumi-info-mini"><h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3></div>' +
+            '</mdui-card></a>';
+    }
+
+    // 渲染单页：网格 + 文章列表同款分页（上一页/下一页）
+    function renderBangumiPage(container, data, page, cardBuilder, isWatched) {
+        var totalPages = Math.max(1, Math.ceil(data.length / BANGUMI_PAGE_SIZE));
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
+
+        var start = (page - 1) * BANGUMI_PAGE_SIZE;
+        var slice = data.slice(start, start + BANGUMI_PAGE_SIZE);
+
+        var gridClass = 'bangumi-grid' + (isWatched ? ' bangumi-grid-watched' : '');
+        var html = '<div class="' + gridClass + '">';
+        slice.forEach(function(item) { html += cardBuilder(item); });
+        html += '</div>';
+
+        // 分页控件（与 index.php / archive.php 文章列表保持一致）
+        if (totalPages > 1) {
+            html += '<div class="bangumi-page-nav">';
+            if (page > 1) {
+                html += '<mdui-button variant="filled" icon="arrow_back" data-bangumi-page="' + (page - 1) + '">上一页</mdui-button>';
+            } else {
+                html += '<span></span>';
+            }
+            html += '<span class="bangumi-page-info">第 ' + page + ' / ' + totalPages + ' 页</span>';
+            if (page < totalPages) {
+                html += '<mdui-button variant="filled" end-icon="arrow_forward" data-bangumi-page="' + (page + 1) + '" style="margin-left:auto;">下一页</mdui-button>';
+            } else {
+                html += '<span style="margin-left:auto;"></span>';
+            }
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+
+        // 绑定分页按钮
+        container.querySelectorAll('[data-bangumi-page]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var newPage = parseInt(btn.getAttribute('data-bangumi-page'), 10);
+                if (isWatched) {
+                    renderWatchedPage(newPage);
+                } else {
+                    renderWatchingPage(newPage);
+                }
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    }
+
+    function renderWatchingPage(page) {
+        watchingPage = page;
+        renderBangumiPage(document.getElementById('bangumi-watching'), watchingData, page, buildWatchingCard, false);
+    }
+
+    function renderWatchedPage(page) {
+        watchedPage = page;
+        renderBangumiPage(document.getElementById('bangumi-watched'), watchedData, page, buildWatchedCard, true);
+    }
+
     function renderWatching(data) {
-        var container = document.getElementById('bangumi-watching');
+        watchingData = data;
+        watchingPage = 1;
         document.getElementById('bangumi-watching-count').textContent = data.length;
 
         if (data.length === 0) {
+            var container = document.getElementById('bangumi-watching');
             container.innerHTML = '<mdui-card variant="outlined" class="bangumi-empty">' +
                 '<mdui-icon name="inbox"></mdui-icon>' +
                 '<span>最近没有在看呢，看看以前都看过什么？</span>' +
@@ -787,56 +888,20 @@ function initBangumi() {
             return;
         }
 
-        var html = '<div class="bangumi-grid">';
-        data.forEach(function(item) {
-            var subtitle = item.name && item.name !== item.name_cn
-                ? '<p class="bangumi-subtitle">' + escapeHtml(item.name) + '</p>' : '';
-            var chips = '';
-            if (item.eps_count > 0) {
-                chips += '<mdui-chip icon="movie" disabled elevated>' + item.ep_status + ' / ' + item.eps_count + '</mdui-chip>';
-            }
-            if (item.air_weekday) {
-                chips += '<mdui-chip icon="schedule" disabled elevated>' + escapeHtml(item.air_weekday) + '</mdui-chip>';
-            }
-            if (item.air_date) {
-                chips += '<mdui-chip icon="event" disabled elevated>' + escapeHtml(item.air_date) + '</mdui-chip>';
-            }
-            var progress = item.eps_count > 0
-                ? '<div class="bangumi-progress-wrapper"><mdui-linear-progress value="' + item.ep_status + '" max="' + item.eps_count + '"></mdui-linear-progress></div>' : '';
-
-            html += '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
-                '<mdui-card variant="elevated" class="bangumi-card">' +
-                '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
-                '<div class="bangumi-info">' +
-                '<h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3>' +
-                subtitle +
-                '<div class="bangumi-meta">' + chips + '</div>' +
-                progress +
-                '</div></mdui-card></a>';
-        });
-        html += '</div>';
-        container.innerHTML = html;
+        renderWatchingPage(1);
     }
 
     function renderWatched(data) {
-        var container = document.getElementById('bangumi-watched');
+        watchedData = data;
+        watchedPage = 1;
         document.getElementById('bangumi-watched-count').textContent = data.length;
 
         if (data.length === 0) {
-            container.innerHTML = '<mdui-card variant="outlined" class="bangumi-empty"><mdui-icon name="inbox"></mdui-icon><span>暂无已看的番剧</span></mdui-card>';
+            document.getElementById('bangumi-watched').innerHTML = '<mdui-card variant="outlined" class="bangumi-empty"><mdui-icon name="inbox"></mdui-icon><span>暂无已看的番剧</span></mdui-card>';
             return;
         }
 
-        var html = '<div class="bangumi-grid bangumi-grid-watched">';
-        data.forEach(function(item) {
-            html += '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
-                '<mdui-card variant="elevated" class="bangumi-card-mini">' +
-                '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
-                '<div class="bangumi-info-mini"><h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3></div>' +
-                '</mdui-card></a>';
-        });
-        html += '</div>';
-        container.innerHTML = html;
+        renderWatchedPage(1);
     }
 
     function renderError(containerId) {

@@ -4,7 +4,7 @@
 <header id="header">
     <div class="container">
         <div class="row">
-            <mdui-card variant="elevated" clickable id="header-card">
+            <mdui-card variant="elevated" id="header-card">
                 <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>"></img>
                 <div class="header-content">
                     <h1 class="img-title"><?php $this->title() ?></h1>

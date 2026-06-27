@@ -98,7 +98,7 @@ if ($this->is('index')) {
 <header id="header">
     <div class="container">
         <div class="row">
-            <mdui-card variant="elevated" clickable id="header-card">
+            <mdui-card variant="elevated" id="header-card">
                 <?php $headerImageUrl = trim((string)($this->options->headerImage ?? '')); ?>
                 <?php if (!empty($headerImageUrl)): ?>
                 <img class="img-invert" src="<?php echo htmlspecialchars($headerImageUrl); ?>"></img>

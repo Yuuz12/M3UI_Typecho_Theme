@@ -214,11 +214,16 @@ class BangumiAPI
 
             foreach ($data['data'] as $item) {
                 $subject = $item['subject'] ?? array();
+                $date = $subject['date'] ?? '';
 
                 $result[] = array(
                     'name' => $subject['name'] ?? '',
                     'name_cn' => $subject['name_cn'] ?? $subject['name'] ?? '',
                     'url' => 'https://bgm.tv/subject/' . ($subject['id'] ?? ''),
+                    'ep_status' => $item['ep_status'] ?? 0,
+                    'eps_count' => $subject['eps'] ?? ($subject['total_episodes'] ?? 0),
+                    'air_date' => $date,
+                    'air_weekday' => $this->getWeekday($date),
                     'img' => $this->replaceImgUrl(isset($subject['images']['large'])
                         ? str_replace('http://', 'https://', $subject['images']['large']) : ''),
                     'id' => $subject['id'] ?? 0,
@@ -368,19 +373,10 @@ $this->need('header.php');
 /* ===== 番剧网格 ===== */
 .bangumi-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
     padding-top: 16px;
-}
-
-.bangumi-grid-watched {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.bangumi-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
+    min-width: 0;
 }
 
 .bangumi-card, .bangumi-card-mini {
@@ -389,16 +385,21 @@ $this->need('header.php');
     outline: 2px solid transparent;
     outline-offset: 2px;
     height: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
 }
 
-.bangumi-card-link:hover .bangumi-card,
-.bangumi-card-link:hover .bangumi-card-mini {
+.bangumi-card:hover,
+.bangumi-card-mini:hover {
     outline: 2px solid rgb(var(--mdui-color-primary));
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
-.bangumi-card-link:focus-visible .bangumi-card,
-.bangumi-card-link:focus-visible .bangumi-card-mini {
+.bangumi-card:focus-visible,
+.bangumi-card-mini:focus-visible {
     outline: 2px solid rgb(var(--mdui-color-primary));
 }
 
@@ -416,9 +417,11 @@ $this->need('header.php');
     display: block;
 }
 
-/* ===== 在看卡片信息 ===== */
+/* ===== 卡片信息 ===== */
 .bangumi-info {
     padding: 16px;
+    overflow: hidden;
+    min-width: 0;
 }
 
 .bangumi-title {
@@ -458,11 +461,6 @@ $this->need('header.php');
     margin-top: 8px;
 }
 
-/* ===== 已看迷你卡片 ===== */
-.bangumi-info-mini {
-    padding: 12px;
-}
-
 /* ===== 空状态 ===== */
 .bangumi-empty {
     padding: 48px 24px;
@@ -491,16 +489,12 @@ $this->need('header.php');
     }
 
     .bangumi-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .bangumi-grid-watched {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 480px) {
-    .bangumi-grid-watched {
+    .bangumi-grid {
         grid-template-columns: 1fr;
     }
 }

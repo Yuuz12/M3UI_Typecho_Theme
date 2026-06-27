@@ -587,6 +587,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (card) {
                 const href = card.getAttribute('href');
                 if (href) {
+                    const target = card.getAttribute('target');
+                    const isExternal = href.startsWith('http') && !href.includes(window.location.hostname);
+                    
+                    if (target === '_blank' || isExternal) {
+                        return; // 外部链接不拦截
+                    }
+                    
                     e.preventDefault();
                     e.stopPropagation();
                     window.history.pushState({url: href}, '', href);
@@ -790,23 +797,40 @@ function initBangumi() {
         var progress = item.eps_count > 0
             ? '<div class="bangumi-progress-wrapper"><mdui-linear-progress value="' + item.ep_status + '" max="' + item.eps_count + '"></mdui-linear-progress></div>' : '';
 
-        return '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
-            '<mdui-card variant="elevated" class="bangumi-card">' +
+        return '<mdui-card variant="elevated" class="bangumi-card" clickable href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' +
             '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
             '<div class="bangumi-info">' +
             '<h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3>' +
             subtitle +
             '<div class="bangumi-meta">' + chips + '</div>' +
             progress +
-            '</div></mdui-card></a>';
+            '</div></mdui-card>';
     }
 
     function buildWatchedCard(item) {
-        return '<a href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener" class="bangumi-card-link">' +
-            '<mdui-card variant="elevated" class="bangumi-card-mini">' +
+        var subtitle = item.name && item.name !== item.name_cn
+            ? '<p class="bangumi-subtitle">' + escapeHtml(item.name) + '</p>' : '';
+        var chips = '';
+        if (item.eps_count > 0) {
+            chips += '<mdui-chip icon="movie" disabled elevated>' + item.ep_status + ' / ' + item.eps_count + '</mdui-chip>';
+        }
+        if (item.air_weekday) {
+            chips += '<mdui-chip icon="schedule" disabled elevated>' + escapeHtml(item.air_weekday) + '</mdui-chip>';
+        }
+        if (item.air_date) {
+            chips += '<mdui-chip icon="event" disabled elevated>' + escapeHtml(item.air_date) + '</mdui-chip>';
+        }
+        var progress = item.eps_count > 0
+            ? '<div class="bangumi-progress-wrapper"><mdui-linear-progress value="' + item.ep_status + '" max="' + item.eps_count + '"></mdui-linear-progress></div>' : '';
+
+        return '<mdui-card variant="elevated" class="bangumi-card" clickable href="' + escapeHtml(item.url) + '" target="_blank" rel="noopener">' +
             '<div class="bangumi-cover"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.name_cn) + '" loading="lazy"></div>' +
-            '<div class="bangumi-info-mini"><h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3></div>' +
-            '</mdui-card></a>';
+            '<div class="bangumi-info">' +
+            '<h3 class="bangumi-title">' + escapeHtml(item.name_cn) + '</h3>' +
+            subtitle +
+            '<div class="bangumi-meta">' + chips + '</div>' +
+            progress +
+            '</div></mdui-card>';
     }
 
     // 渲染单页：网格 + 文章列表同款分页（上一页/下一页）
@@ -818,8 +842,7 @@ function initBangumi() {
         var start = (page - 1) * BANGUMI_PAGE_SIZE;
         var slice = data.slice(start, start + BANGUMI_PAGE_SIZE);
 
-        var gridClass = 'bangumi-grid' + (isWatched ? ' bangumi-grid-watched' : '');
-        var html = '<div class="' + gridClass + '">';
+        var html = '<div class="bangumi-grid">';
         slice.forEach(function(item) { html += cardBuilder(item); });
         html += '</div>';
 
@@ -851,7 +874,10 @@ function initBangumi() {
                 } else {
                     renderWatchingPage(newPage);
                 }
-                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                requestAnimationFrame(function() {
+                    var page = document.getElementById('bangumi-page');
+                    if (page) page.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
             });
         });
     }

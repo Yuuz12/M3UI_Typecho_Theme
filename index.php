@@ -4,8 +4,8 @@
  *
  * @package M3UI
  * @author Yuuz12
- * @version 1.1.4
- * @link http://m3.yuuz12.top
+ * @version 1.1.5
+ * @link https://yuuz12.top
  */
 
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;

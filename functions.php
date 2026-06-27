@@ -11,6 +11,14 @@ function themeConfig($form)
         _t('在这里填入一个图片 URL 地址, 以在网站标题前加上一个 LOGO')
     );
 
+    $headerImage = new \Typecho\Widget\Helper\Form\Element\Text(
+        'headerImage',
+        null,
+        null,
+        _t('站点头图地址'),
+        _t('在这里填入一个图片 URL 地址作为站点头图，不填则不显示头图')
+    );
+
     $enableIndexPage = new \Typecho\Widget\Helper\Form\Element\Radio(
         'enableIndexPage',
         [
@@ -71,6 +79,7 @@ function themeConfig($form)
     );
 
     $form->addInput($logoUrl);
+    $form->addInput($headerImage);
     $form->addInput($enableIndexPage);
     $form->addInput($icpNumber);
     $form->addInput($icpLink);
@@ -95,19 +104,6 @@ function themeConfig($form)
     $form->addInput($sidebarBlock->multiMode());
 }
 
-/*
-function themeFields($layout)
-{
-    $logoUrl = new \Typecho\Widget\Helper\Form\Element\Text(
-        'logoUrl',
-        null,
-        null,
-        _t('站点LOGO地址'),
-        _t('在这里填入一个图片URL地址, 以在网站标题前加上一个LOGO')
-    );
-    $layout->addItem($logoUrl);
-}
-*/
 
 function themeFields($layout)
 {

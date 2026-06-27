@@ -5,7 +5,7 @@
  * @package custom
  */
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
-$this->need('header.php');
+$this->need('components/header.php');
 
 // 统计文章数据
 $postCount = 0;
@@ -366,5 +366,5 @@ $tagCount = count($tagSet);
 }
 </style>
 
-<?php $this->need('sidebar.php'); ?>
-<?php $this->need('footer.php'); ?>
+<?php $this->need('components/sidebar.php'); ?>
+<?php $this->need('components/footer.php'); ?>

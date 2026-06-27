@@ -262,7 +262,7 @@ if (isset($_GET['bangumi_api'])) {
     exit;
 }
 
-$this->need('header.php');
+$this->need('components/header.php');
 ?>
 
 <div id="main-post">
@@ -500,5 +500,5 @@ $this->need('header.php');
 }
 </style>
 
-<?php $this->need('sidebar.php'); ?>
-<?php $this->need('footer.php'); ?>
+<?php $this->need('components/sidebar.php'); ?>
+<?php $this->need('components/footer.php'); ?>

@@ -1,10 +1,10 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
-<?php $this->need('header.php'); ?>
+<?php $this->need('components/header.php'); ?>
 
 <header id="header">
     <div class="container">
         <div class="row">
-            <mdui-card variant="elevated" id="header-card">
+            <mdui-card variant="elevated" clickable id="header-card">
                 <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>"></img>
                 <div class="header-content">
                     <h1 class="img-title"><?php $this->title() ?></h1>
@@ -63,8 +63,8 @@
         </div>
     </div>
     
-    <?php $this->need("list-template.php");?>
-    <?php $this->need('comments.php'); ?>
+    <?php $this->need("components/list-template.php");?>
+    <?php $this->need('components/comments.php'); ?>
     
     <!-- <ul class="post-near">
         <li>上一篇: <?php $this->thePrev('%s', '没有了'); ?></li>
@@ -73,5 +73,5 @@
     
 </article>
 
-<?php $this->need('sidebar.php'); ?>
-<?php $this->need('footer.php'); ?>
+<?php $this->need('components/sidebar.php'); ?>
+<?php $this->need('components/footer.php'); ?>

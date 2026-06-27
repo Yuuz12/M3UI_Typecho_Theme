@@ -1,5 +1,5 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
-<?php $this->need('header.php'); ?>
+<?php $this->need('components/header.php'); ?>
 
 <article id="main-post" itemtype="http://schema.org/BlogPosting">
     <div class="main-post-title">
@@ -10,8 +10,8 @@
         <?php $this->content(); ?>
     </div>
     
-    <?php $this->need('comments.php'); ?>
+    <?php $this->need('components/comments.php'); ?>
 </article>
 
-<?php $this->need('sidebar.php'); ?>
-<?php $this->need('footer.php'); ?>
+<?php $this->need('components/sidebar.php'); ?>
+<?php $this->need('components/footer.php'); ?>

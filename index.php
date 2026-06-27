@@ -4,12 +4,12 @@
  *
  * @package M3UI
  * @author Yuuz12
- * @version 1.1.5
+ * @version 1.1.6
  * @link https://yuuz12.top
  */
 
 if (!defined('__TYPECHO_ROOT_DIR__')) exit;
-$this->need('header.php');
+$this->need('components/header.php');
 ?>
 
 <div id="main-index">
@@ -74,5 +74,5 @@ $this->need('header.php');
 </div>
 
 
-<?php $this->need('sidebar.php'); ?>
-<?php $this->need('footer.php'); ?>
+<?php $this->need('components/sidebar.php'); ?>
+<?php $this->need('components/footer.php'); ?>

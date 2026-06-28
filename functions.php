@@ -135,6 +135,34 @@ function replaceGravatar($avatar)
 // 注册Gravatar替换钩子
 \Typecho\Plugin::factory('Widget_Abstract_Comments')->gravatar = 'replaceGravatar';
 
+// 编辑器样式卡片插入
+function mduiStyleCardsEditor($content)
+{
+    $themeDir = __DIR__;
+    include $themeDir . '/components/editor-style-cards.php';
+}
+\Typecho\Plugin::factory('admin/write-post.php')->content = 'mduiStyleCardsEditor';
+\Typecho\Plugin::factory('admin/write-page.php')->content = 'mduiStyleCardsEditor';
+
+/**
+ * 解析 mdui 样式卡片短代码
+ * [m3ui_error]文本[/m3ui_error]  -> 红色错误提示卡片
+ * [m3ui_warning]文本[/m3ui_warning] -> 黄色警告提示卡片
+ * [m3ui_success]文本[/m3ui_success] -> 绿色成功提示卡片
+ */
+function parseMduiNotes($html)
+{
+    $maps = [
+        '/\[m3ui_error\](.*?)\[\/m3ui_error\]/s'   => '<mdui-card variant="filled" class="mdui-note mdui-note-red"><mdui-icon name="error"></mdui-icon><span class="mdui-note-content">$1</span></mdui-card>',
+        '/\[m3ui_warning\](.*?)\[\/m3ui_warning\]/s' => '<mdui-card variant="filled" class="mdui-note mdui-note-yellow"><mdui-icon name="lightbulb"></mdui-icon><span class="mdui-note-content">$1</span></mdui-card>',
+        '/\[m3ui_success\](.*?)\[\/m3ui_success\]/s' => '<mdui-card variant="filled" class="mdui-note mdui-note-green"><mdui-icon name="check_circle"></mdui-icon><span class="mdui-note-content">$1</span></mdui-card>',
+    ];
+    $html = preg_replace(array_keys($maps), array_values($maps), $html);
+    // 清理 Markdown 解析器在卡片间插入的 <br>
+    $html = preg_replace('#</mdui-card>\s*<br\s*/?>\s*<mdui-card#', '</mdui-card><mdui-card', $html);
+    return $html;
+}
+
 /**
  * 获取文章封面图
  * 优先级：自定义字段 indexCardImage > 默认图 img/empty.png

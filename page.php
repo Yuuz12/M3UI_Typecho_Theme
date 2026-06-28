@@ -7,7 +7,7 @@
     </div>
     
     <div class="main-post-content mdui-prose" itemprop="articleBody">
-        <?php $this->content(); ?>
+        <?php echo parseMduiNotes($this->content); ?>
     </div>
     
     <?php $this->need('components/comments.php'); ?>

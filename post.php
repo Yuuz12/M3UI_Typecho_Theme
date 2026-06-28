@@ -49,7 +49,7 @@
                 <?php endif; ?>
             </div>
             <div class="mdui-prose">
-            <?php $this->content(); ?>
+            <?php echo parseMduiNotes($this->content); ?>
             </div>
         </div>
         

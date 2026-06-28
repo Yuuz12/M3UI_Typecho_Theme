@@ -195,6 +195,11 @@ function generateTableOfContents() {
         const tocContainer = document.getElementById('toc-container');
         if (tocContainer) {
             tocContainer.style.display = 'none';
+            // 添加类标记无目录状态，用于CSS居中布局
+            const contentContainer = document.querySelector('.post-content-container');
+            if (contentContainer) {
+                contentContainer.classList.add('no-toc');
+            }
         }
         return;
     }
@@ -507,6 +512,15 @@ function initSpotlight() {
             keyboard: true
         });
     }
+    
+    // 监听Spotlight的打开/关闭事件，防止页面滚动
+    document.addEventListener('spotlightshow', function() {
+        document.body.classList.add('spotlight-open');
+    });
+    
+    document.addEventListener('spotlightclose', function() {
+        document.body.classList.remove('spotlight-open');
+    });
 }
 
 // 页面加载完成后初始化

@@ -1426,8 +1426,7 @@ tr:hover {
 }
 
 /* 引用块样式 */
-blockquote,
-.mdui-prose blockquote {
+blockquote {
     margin: 0 !important;
     padding: 16px 24px;
     border-left: 4px solid rgb(var(--mdui-color-primary));
@@ -1556,12 +1555,12 @@ ol ol, ul ol {
 #spotlight .spl-scene,
 #spotlight .spl-pane,
 #spotlight .spl-track {
-    position: fixed !important;
+    position: absolute !important;
     left: 0 !important;
     top: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    /* 不要覆盖transform，Spotlight需要它来实现拖拽功能 */
 }
 
 /* 针对桌面端大屏幕的特别处理 */

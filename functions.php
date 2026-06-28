@@ -149,6 +149,7 @@ function mduiStyleCardsEditor($content)
  * [m3ui_error]文本[/m3ui_error]  -> 红色错误提示卡片
  * [m3ui_warning]文本[/m3ui_warning] -> 黄色警告提示卡片
  * [m3ui_success]文本[/m3ui_success] -> 绿色成功提示卡片
+ * [m3ui_collapse title="标题"]内容[/m3ui_collapse] -> 折叠面板（支持嵌套）
  */
 function parseMduiNotes($html)
 {
@@ -158,9 +159,92 @@ function parseMduiNotes($html)
         '/\[m3ui_success\](.*?)\[\/m3ui_success\]/s' => '<mdui-card variant="filled" class="mdui-note mdui-note-green"><mdui-icon name="check_circle"></mdui-icon><span class="mdui-note-content">$1</span></mdui-card>',
     ];
     $html = preg_replace(array_keys($maps), array_values($maps), $html);
+
+    // 折叠面板短代码：使用栈式解析器处理嵌套（正则在跨 <p> 标签时会失败）
+    $html = parseMduiCollapse($html);
+
     // 清理 Markdown 解析器在卡片间插入的 <br>
     $html = preg_replace('#</mdui-card>\s*<br\s*/?>\s*<mdui-card#', '</mdui-card><mdui-card', $html);
+    // 清理包裹 mdui-list 的 <p> 标签（块级元素会被浏览器从 <p> 中拆出）
+    $html = preg_replace('#<p>\s*(<mdui-list>.*?</mdui-list>)\s*</p>#s', '$1', $html);
+    $html = preg_replace('#<p>\s*</p>#', '', $html);
     return $html;
+}
+
+/**
+ * 栈式解析折叠面板短代码，支持嵌套和跨 <p> 标签
+ */
+function parseMduiCollapse($html)
+{
+    $pattern = '/\[m3ui_collapse(?:\s+title="([^"]*)")?\]|\[\/m3ui_collapse\]/';
+    if (!preg_match($pattern, $html)) {
+        return $html;
+    }
+
+    preg_match_all($pattern, $html, $matches, PREG_OFFSET_CAPTURE);
+
+    $stack = [];
+    $result = '';
+    $lastPos = 0;
+
+    foreach ($matches[0] as $idx => $matchInfo) {
+        $tag = $matchInfo[0];
+        $pos = $matchInfo[1];
+
+        // 将标签前的文本追加到当前上下文
+        $textBefore = substr($html, $lastPos, $pos - $lastPos);
+        if (!empty($stack)) {
+            $stack[count($stack) - 1]['content'] .= $textBefore;
+        } else {
+            $result .= $textBefore;
+        }
+
+        if (strpos($tag, '[/') === 0) {
+            // 闭合标签：弹出栈顶并生成 HTML
+            if (!empty($stack)) {
+                $item = array_pop($stack);
+                $content = $item['content'];
+                // 清理 Markdown 在边界插入的 </p> 和 <p>
+                $content = preg_replace('#^\s*</p>\s*#i', '', $content);
+                $content = preg_replace('#\s*<p>\s*$#i', '', $content);
+                $content = trim($content);
+
+                $htmlOut = '<mdui-list><mdui-collapse><mdui-collapse-item><mdui-list-item slot="header" icon="expand_more">' . htmlspecialchars($item['title']) . '</mdui-list-item><div class="m3ui-collapse-body">' . $content . '</div></mdui-collapse-item></mdui-collapse></mdui-list>';
+
+                if (!empty($stack)) {
+                    $stack[count($stack) - 1]['content'] .= $htmlOut;
+                } else {
+                    $result .= $htmlOut;
+                }
+            }
+        } else {
+            // 开标签：压入栈
+            $title = !empty($matches[1][$idx][0]) ? $matches[1][$idx][0] : '点击展开';
+            $stack[] = ['title' => $title, 'content' => ''];
+        }
+
+        $lastPos = $pos + strlen($tag);
+    }
+
+    // 追加最后一个标签之后的文本
+    $remaining = substr($html, $lastPos);
+    if (!empty($stack)) {
+        // 未闭合的标签：原样输出内容
+        while (!empty($stack)) {
+            $item = array_pop($stack);
+            $unclosed = '[m3ui_collapse title="' . $item['title'] . '"]' . $item['content'];
+            if (!empty($stack)) {
+                $stack[count($stack) - 1]['content'] .= $unclosed;
+            } else {
+                $result .= $unclosed;
+            }
+        }
+        $result .= $remaining;
+    } else {
+        $result .= $remaining;
+    }
+
+    return $result;
 }
 
 /**

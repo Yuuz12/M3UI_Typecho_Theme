@@ -78,6 +78,28 @@ $themeUrl = $options->themeUrl;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
+    function insertCollapse() {
+        var textarea = document.getElementById('text');
+        if (!textarea) return;
+
+        var titleText = '折叠标题';
+        var contentText = '在此输入折叠内容';
+        var shortcode = '[m3ui_collapse title="' + titleText + '"]' + contentText + '[/m3ui_collapse]';
+
+        var start = textarea.selectionStart;
+        var end   = textarea.selectionEnd;
+        var text  = textarea.value;
+        textarea.value = text.substring(0, start) + shortcode + text.substring(end);
+
+        // 选中标题文本方便修改
+        var titleStart = start + '[m3ui_collapse title="'.length;
+        textarea.selectionStart = titleStart;
+        textarea.selectionEnd = titleStart + titleText.length;
+        textarea.focus();
+
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     function initButton() {
         var row = document.getElementById('wmd-button-row');
         if (!row) return;
@@ -124,6 +146,26 @@ $themeUrl = $options->themeUrl;
             })(keys[i]);
             menu.appendChild(item);
         }
+
+        // 分隔线
+        var divider = document.createElement('mdui-divider');
+        menu.appendChild(divider);
+
+        // 折叠面板选项
+        var collapseItem = document.createElement('mdui-menu-item');
+        collapseItem.setAttribute('value', 'collapse');
+        var collapseIcon = document.createElement('mdui-icon');
+        collapseIcon.setAttribute('slot', 'icon');
+        collapseIcon.setAttribute('name', 'expand_more');
+        collapseIcon.style.color = '#5e5e5e';
+        collapseItem.appendChild(collapseIcon);
+        collapseItem.appendChild(document.createTextNode('折叠面板'));
+        collapseItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            insertCollapse();
+            menu.style.display = 'none';
+        });
+        menu.appendChild(collapseItem);
 
         wrap.appendChild(btn);
         wrap.appendChild(menu);

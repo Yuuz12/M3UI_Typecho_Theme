@@ -1,6 +1,12 @@
 /* ------------------
  * Global style
  * --------------- */
+
+/* 全局文字选中样式 */
+::selection {
+    background: rgb(var(--mdui-color-primary-container)) !important;
+    color: rgb(var(--mdui-color-on-primary-container)) !important;
+}
 a {
     color: rgb(var(--mdui-color-primary));
     text-decoration: none;
@@ -1221,53 +1227,76 @@ body {
     color: inherit !important;
 }
 
-/* 代码块样式 - 适配MDUI设计 */
-pre[class*="language-"] {
-    background: rgb(var(--mdui-color-surface-container-low)) !important;
-    border-radius: var(--mdui-shape-corner-medium) !important;
-    padding: 32px 16px 16px 16px !important; /* 增加上边距为顶部标签留出更多空间 */
-    overflow: auto !important;
+/* Prism代码块样式 - MDUI重置 */
+pre[class*="language-"],
+pre[data-language] {
+    background: rgb(var(--mdui-color-surface-container-high)) !important;
+    border-radius: var(--mdui-shape-corner-large) !important;
+    padding: 0 !important;
+    margin: 24px 0 !important;
+    overflow: hidden !important;
     position: relative !important;
-    margin: 16px 0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgb(var(--mdui-color-outline-variant)) !important;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace !important;
 }
 
-/* 代码块语言标识 */
+pre[class*="language-"] > code,
+pre[data-language] > code {
+    display: block !important;
+    padding: 48px 24px 24px !important;
+    overflow-x: auto !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+    tab-size: 4 !important;
+    color: rgb(var(--mdui-color-on-surface)) !important;
+    background: transparent !important;
+}
+
+/* 代码块顶部标签栏 */
 pre[data-language]::before {
     content: attr(data-language) !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
-    background: rgb(var(--mdui-color-secondary-container)) !important;
-    color: rgb(var(--mdui-color-on-secondary-container)) !important;
-    padding: 6px 12px !important;
-    border-radius: 0 var(--mdui-shape-corner-medium) 0 0 !important;
+    right: 0 !important;
+    background: rgb(var(--mdui-color-surface-container-highest)) !important;
+    color: rgb(var(--mdui-color-on-surface-variant)) !important;
+    padding: 10px 24px !important;
     font-size: 12px !important;
-    font-weight: bold !important;
+    font-weight: 600 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    text-overflow: ellipsis !important;
-    max-width: calc(100% - 24px) !important;
-    overflow: hidden !important;
+    letter-spacing: 1px !important;
+    border-bottom: 1px solid rgb(var(--mdui-color-outline-variant)) !important;
+    font-family: system-ui, -apple-system, sans-serif !important;
 }
 
-:not(pre) > code[class*="language-"],
-pre[class*="language-"] {
-    background: rgb(var(--mdui-color-surface-container-low)) !important;
+/* 行内代码 */
+:not(pre) > code[class*="language-"] {
+    background: rgb(var(--mdui-color-surface-container)) !important;
+    color: rgb(var(--mdui-color-primary)) !important;
+    padding: 3px 8px !important;
+    border-radius: var(--mdui-shape-corner-small) !important;
+    font-size: 0.9em !important;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace !important;
+    border: 1px solid rgb(var(--mdui-color-outline-variant)) !important;
 }
 
+/* Prism Token颜色 - MDUI配色 */
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-    color: rgb(var(--mdui-color-outline));
+    color: rgb(var(--mdui-color-outline)) !important;
+    font-style: italic !important;
 }
 
 .token.punctuation {
-    color: rgb(var(--mdui-color-on-surface-variant));
+    color: rgb(var(--mdui-color-on-surface-variant)) !important;
 }
 
 .token.namespace {
-    opacity: 0.7;
+    opacity: 0.7 !important;
 }
 
 .token.property,
@@ -1277,7 +1306,7 @@ pre[class*="language-"] {
 .token.constant,
 .token.symbol,
 .token.deleted {
-    color: rgb(var(--mdui-color-error));
+    color: rgb(var(--mdui-color-error)) !important;
 }
 
 .token.selector,
@@ -1286,7 +1315,7 @@ pre[class*="language-"] {
 .token.char,
 .token.builtin,
 .token.inserted {
-    color: rgb(var(--mdui-color-tertiary));
+    color: rgb(var(--mdui-color-tertiary)) !important;
 }
 
 .token.operator,
@@ -1295,39 +1324,44 @@ pre[class*="language-"] {
 .language-css .token.string,
 .style .token.string,
 .token.variable {
-    color: rgb(var(--mdui-color-primary));
+    color: rgb(var(--mdui-color-primary)) !important;
 }
 
 .token.atrule,
 .token.attr-value,
 .token.keyword {
-    color: rgb(var(--mdui-color-secondary));
+    color: rgb(var(--mdui-color-secondary)) !important;
 }
 
 .token.function {
-    color: rgb(var(--mdui-color-primary));
+    color: rgb(var(--mdui-color-primary)) !important;
+    font-weight: 500 !important;
+}
+
+.token.class-name {
+    color: rgb(var(--mdui-color-tertiary)) !important;
 }
 
 .token.regex,
 .token.important,
 .token.annotation {
-    color: rgb(var(--mdui-color-tertiary));
+    color: rgb(var(--mdui-color-tertiary)) !important;
 }
 
 .token.important,
 .token.bold {
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .token.italic {
-    font-style: italic;
+    font-style: italic !important;
 }
 
 .token.entity {
-    cursor: help;
+    cursor: help !important;
 }
 
-/* 表格样式 - MDUI设计 */
+/* 表格样式 */
 table {
     width: 100%;
     border-collapse: separate;
@@ -1382,13 +1416,14 @@ tr:hover {
     background: rgb(var(--mdui-color-surface-container-high));
 }
 
-/* 引用块样式 - MDUI设计 */
-blockquote {
-    margin: 16px 0;
+/* 引用块样式 */
+blockquote,
+.mdui-prose blockquote {
+    margin: 0 !important;
     padding: 16px 24px;
     border-left: 4px solid rgb(var(--mdui-color-primary));
     background: rgb(var(--mdui-color-surface-container));
-    border-radius: 0 var(--mdui-shape-corner-medium) var(--mdui-shape-corner-medium) 0;
+    border-radius: var(--mdui-shape-corner-medium);
     font-style: italic;
     color: rgb(var(--mdui-color-on-surface-variant));
     position: relative;
@@ -1406,7 +1441,7 @@ blockquote p:last-child {
     margin-bottom: 0;
 }
 
-/* 文本样式 - MDUI设计 */
+/* 文本样式 */
 strong, b {
     font-weight: var(--mdui-typescale-body-large-weight);
     color: rgb(var(--mdui-color-on-surface));
@@ -1423,7 +1458,7 @@ strong em, em strong, b i, i b {
     color: rgb(var(--mdui-color-on-surface));
 }
 
-/* 列表样式 - MDUI设计 */
+/* 列表样式 */
 ul, ol {
     margin: 16px 0;
     padding-left: 32px;
@@ -1672,4 +1707,28 @@ mdui-card.mdui-note-green mdui-icon {
     mdui-card.mdui-note-green mdui-icon {
         color: rgb(129, 199, 132);
     }
+}
+
+/* ==================== 折叠面板 (mdui-collapse) ==================== */
+.mdui-prose mdui-list {
+    display: block;
+    margin: 16px 0;
+    padding: 0;
+    border-radius: var(--mdui-shape-corner-medium, 12px);
+    overflow: hidden;
+    border: 1px solid rgb(var(--mdui-color-outline-variant, 202, 196, 208));
+}
+
+.mdui-prose mdui-collapse {
+    display: block;
+}
+
+.mdui-prose mdui-collapse-item {
+    display: block;
+}
+
+.mdui-prose .m3ui-collapse-body {
+    padding: 20px;
+    color: rgb(var(--mdui-color-on-surface-variant, 73, 69, 79));
+    line-height: 1.7;
 }

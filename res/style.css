@@ -1634,17 +1634,10 @@ ol ol, ul ol {
     bottom: 0 !important;
 }
 
-/* 确保Spotlight内部元素不受外部transform影响 */
-#spotlight .spl-scene,
-#spotlight .spl-pane,
-#spotlight .spl-track {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    /* 不要覆盖transform，Spotlight需要它来实现拖拽功能 */
-}
+/* 注意：不要覆盖 .spl-pane 的 left 属性！
+   Spotlight 库通过给每个 pane 设置 left: 100% * index 来水平排列多张图片，
+   强制 left:0 会导致所有 pane 重叠，切换时后续图片黑屏。
+   库自带的 position/width/height 已正确，无需覆盖内部元素样式。 */
 
 /* 针对桌面端大屏幕的特别处理 */
 @media screen and (min-width: 1300px) {

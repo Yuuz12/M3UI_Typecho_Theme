@@ -259,6 +259,10 @@ body {
         max-width: 100%;
     }
     
+    .main-post-content.no-toc {
+        max-width: 100%;
+    }
+    
     .main-post-content {
         flex: 1;
         min-width: 300px;

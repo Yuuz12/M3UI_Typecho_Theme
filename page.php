@@ -6,7 +6,7 @@
         <h2><?php $this->title() ?></h2>
     </div>
     
-    <div class="main-post-content mdui-prose" itemprop="articleBody">
+    <div class="main-post-content no-toc mdui-prose" itemprop="articleBody">
         <?php echo parseMduiNotes($this->content); ?>
     </div>
     

@@ -224,33 +224,50 @@ function generateTableOfContents() {
         // 获取标题级别 (h1 -> level 1, h2 -> level 2, etc.)
         const level = parseInt(heading.tagName.charAt(1));
         
+        // 生成 slug 化的类名
+        const slug = heading.textContent.trim()
+            .toLowerCase()
+            .replace(/[^\w\u4e00-\u9fff]+/g, '-')
+            .replace(/^-+|-+$/g, '') || 'heading-' + index;
+        
         // 记录标题信息
         tocItems.push({
             id: id,
             level: level,
             text: heading.textContent.trim(),
+            slug: slug,
             element: heading
         });
     });
     
-    // 构建目录树结构
+    // 构建目录列表结构
     if (tocItems.length > 0) {
         let prevLevel = 0; // 记录前一个标题的级别
         
         tocItems.forEach(item => {
+            // h2 级别与其他级别之间添加分隔线
+            if (item.level === 2 && prevLevel !== 0 && prevLevel !== 2) {
+                const divider = document.createElement('div');
+                divider.className = 'divider';
+                tocContent.appendChild(divider);
+            }
+            
             const listItem = document.createElement('mdui-list-item');
-            listItem.className = `toc-item toc-level-${item.level}`;
+            
+            // h1 独立样式，h2 加粗，h3 及以下不加粗
+            let levelClass = '';
+            if (item.level === 1) {
+                levelClass = ' item-h1';
+            } else if (item.level <= 2) {
+                levelClass = ' item-bold';
+            }
+            listItem.className = `item item-${item.slug}${levelClass}`;
+            listItem.setAttribute('rounded', '');
+            listItem.setAttribute('alignment', 'center');
+            listItem.setAttribute('headline-line', '1');
             listItem.setAttribute('href', '#' + item.id);
             listItem.setAttribute('data-target', item.id);
-            listItem.setAttribute('rounded', '');
-            listItem.setAttribute('nonclickable', '');
-            listItem.setAttribute('headline-line', '1');
             listItem.setAttribute('data-level', item.level);
-            
-            // 一级标题与其他标题之间留出顶部距离
-            if (item.level === 1 && prevLevel !== 0) {
-                listItem.style.marginTop = '8px';
-            }
             
             // 设置标题文本
             listItem.textContent = item.text;
@@ -370,12 +387,12 @@ function setupIntersectionObserver() {
 // 更新活动的目录项
 function updateActiveTocItem(activeId) {
     // 移除所有活动状态
-    document.querySelectorAll('#toc-content mdui-list-item').forEach(item => {
+    document.querySelectorAll('#toc-content .item').forEach(item => {
         item.classList.remove('toc-active');
     });
     
     // 为当前活动的列表项添加活动状态
-    const activeItem = document.querySelector(`#toc-content mdui-list-item[data-target="${activeId}"]`);
+    const activeItem = document.querySelector(`#toc-content .item[data-target="${activeId}"]`);
     if (activeItem) {
         activeItem.classList.add('toc-active');
     }
@@ -571,8 +588,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 统一的链接点击处理（避免多个监听器冲突）
         document.addEventListener('click', function(e) {
-            // 检查是否点击了目录中的mdui-list-item，如果是则跳过（目录项用于页面内跳转）
-            if (e.target.closest('#toc-content mdui-list-item')) {
+            // 检查是否点击了目录中的项，如果是则跳过（目录项用于页面内跳转）
+            if (e.target.closest('#toc-content .item')) {
                 return;
             }
 

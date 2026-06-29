@@ -54,12 +54,9 @@
         </div>
         
         <!-- 文章目录 -->
-        <div id="toc-container">
-            <div class="toc-header">
-                <mdui-icon name="menu_book"></mdui-icon>
-                <span>文章目录</span>
-            </div>
-            <mdui-list id="toc-content"></mdui-list>
+        <div id="toc-container" class="contents">
+            <div class="title">本页目录</div>
+            <mdui-list class="items" id="toc-content"></mdui-list>
         </div>
     </div>
     

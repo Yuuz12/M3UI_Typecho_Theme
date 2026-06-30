@@ -37,6 +37,7 @@ if ($this->is('index')) {
 <!-- 导航栏 - 在PJAX容器外部，不随页面切换重载 -->
 <mdui-navigation-rail divider value="<?php echo $currentValue; ?>" alignment="center">
     <mdui-button-icon icon="search" class="search-trigger" slot="bottom"></mdui-button-icon>
+    <mdui-button-icon icon="contrast" class="theme-toggle-rail" slot="bottom"></mdui-button-icon>
     <mdui-navigation-rail-item icon="home--outlined" value="home" href="<?php $this->options->siteUrl(); ?>">首页</mdui-navigation-rail-item>
     <?php if ($this->options->enableIndexPage): ?>
     <mdui-navigation-rail-item icon="article--outlined" value="archive" href="<?php $this->options->siteUrl(); ?>">文章</mdui-navigation-rail-item>
@@ -70,6 +71,13 @@ if ($this->is('index')) {
         <mdui-list-item href="<?php echo $page['permalink']; ?>" value="<?php echo $page['slug']; ?>" <?php echo $currentValue == $page['slug'] ? 'selected' : ''; ?> icon="<?php echo $page['icon']; ?>" headline="<?php echo $page['title']; ?>"></mdui-list-item>
         <?php endforeach; ?>
     </mdui-list>
+    <div style="padding: 12px 16px;">
+        <mdui-segmented-button-group selects="single" full-width id="theme-switch" value="<?php echo $this->options->darkMode ?: 'auto'; ?>">
+            <mdui-segmented-button value="light" icon="light_mode">亮色</mdui-segmented-button>
+            <mdui-segmented-button value="auto" icon="contrast">跟随系统</mdui-segmented-button>
+            <mdui-segmented-button value="dark" icon="dark_mode">暗色</mdui-segmented-button>
+        </mdui-segmented-button-group>
+    </div>
 </mdui-navigation-drawer>
 
 <!-- 全站搜索对话框 -->

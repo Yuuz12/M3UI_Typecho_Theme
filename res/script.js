@@ -635,10 +635,75 @@ function onPageReady() {
     initCodeBlockCopy();
 }
 
+// ==================== 主题模式切换 ====================
+
+function initThemeSwitch() {
+    var group = document.getElementById('theme-switch');
+    if (!group) return;
+
+    // 从 localStorage 恢复选中状态
+    var saved = localStorage.getItem('m3ui-theme');
+    if (saved && (saved === 'light' || saved === 'dark' || saved === 'auto')) {
+        group.value = saved;
+    }
+
+    // 避免重复绑定
+    if (group.getAttribute('data-bound')) return;
+    group.setAttribute('data-bound', '1');
+
+    group.addEventListener('change', function(e) {
+        var value = e.target.value;
+        if (!value) return;
+        applyTheme(value);
+        localStorage.setItem('m3ui-theme', value);
+    });
+}
+
+function applyTheme(mode) {
+    document.documentElement.classList.remove('mdui-theme-auto', 'mdui-theme-light', 'mdui-theme-dark');
+    document.documentElement.classList.add('mdui-theme-' + mode);
+    // 更新 rail 按钮图标
+    var railBtn = document.querySelector('.theme-toggle-rail');
+    if (railBtn) {
+        var icons = { light: 'light_mode', dark: 'dark_mode', auto: 'contrast' };
+        railBtn.setAttribute('icon', icons[mode] || 'contrast');
+    }
+}
+
+// navigation-rail 主题按钮：点击循环切换 light → auto → dark
+function initThemeToggleRail() {
+    var btn = document.querySelector('.theme-toggle-rail');
+    if (!btn) return;
+    if (btn.getAttribute('data-bound')) return;
+    btn.setAttribute('data-bound', '1');
+
+    btn.addEventListener('click', function() {
+        var current = localStorage.getItem('m3ui-theme') || (document.documentElement.classList.contains('mdui-theme-dark') ? 'dark' : document.documentElement.classList.contains('mdui-theme-light') ? 'light' : 'auto');
+        var order = ['light', 'auto', 'dark'];
+        var idx = order.indexOf(current);
+        var next = order[(idx + 1) % order.length];
+        applyTheme(next);
+        localStorage.setItem('m3ui-theme', next);
+        // 同步抽屉里的 SegmentedButton
+        var group = document.getElementById('theme-switch');
+        if (group) group.value = next;
+    });
+
+    // 初始化图标
+    var saved = localStorage.getItem('m3ui-theme');
+    if (saved) applyTheme(saved);
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', onPageReady);
+    document.addEventListener('DOMContentLoaded', function() {
+        onPageReady();
+        initThemeSwitch();
+        initThemeToggleRail();
+    });
 } else {
     onPageReady();
+    initThemeSwitch();
+    initThemeToggleRail();
 }
 
 // ==================== PJAX 功能 ====================
@@ -857,6 +922,10 @@ function reinitializeAfterPjax() {
     if (document.querySelector('#comments')) {
         setupCommentForm();
     }
+
+    // 重新初始化主题切换器
+    initThemeSwitch();
+    initThemeToggleRail();
 
     // 重新应用主题色
     const accentColor = document.querySelector('meta[name="theme-color"]')?.content || '#6200ee';

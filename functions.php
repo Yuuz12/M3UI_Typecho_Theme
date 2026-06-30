@@ -78,12 +78,25 @@ function themeConfig($form)
         _t('用于番组计划页面，填写图片反代地址（如 https://img.example.com），不填则默认使用 Bangumi 原始图片地址')
     );
 
+    $darkMode = new \Typecho\Widget\Helper\Form\Element\Radio(
+        'darkMode',
+        [
+            'auto'  => '跟随系统',
+            'light' => '亮色',
+            'dark'  => '暗色'
+        ],
+        'auto',
+        _t('暗黑模式'),
+        _t('设置默认的颜色模式，用户可在前台手动切换并持久化')
+    );
+
     $form->addInput($logoUrl);
     $form->addInput($headerImage);
     $form->addInput($enableIndexPage);
     $form->addInput($icpNumber);
     $form->addInput($icpLink);
     $form->addInput($accentColor);
+    $form->addInput($darkMode);
     $form->addInput($bangumiID);
     $form->addInput($bangumiApiProxy);
     $form->addInput($bangumiImgProxy);

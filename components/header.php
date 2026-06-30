@@ -1,10 +1,20 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <!DOCTYPE HTML>
-<html class="mdui-theme-auto">
+<html class="mdui-theme-<?php echo $this->options->darkMode ?: 'auto'; ?>">
 <head>
     <meta charset="<?php $this->options->charset(); ?>">
     <meta name="renderer" content="webkit">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+    // 防闪烁：优先读取 localStorage 中的用户选择
+    (function(){
+        var saved = localStorage.getItem('m3ui-theme');
+        if (saved && (saved === 'light' || saved === 'dark' || saved === 'auto')) {
+            document.documentElement.classList.remove('mdui-theme-auto','mdui-theme-light','mdui-theme-dark');
+            document.documentElement.classList.add('mdui-theme-' + saved);
+        }
+    })();
+    </script>
     <title><?php $this->archiveTitle([
             'category' => _t('分类 %s 下的文章'),
             'search'   => _t('包含关键字 %s 的文章'),

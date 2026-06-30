@@ -1,56 +1,6 @@
 <?php if (!defined('__TYPECHO_ROOT_DIR__')) exit; ?>
 <?php $this->need('components/header.php'); ?>
 
-<?php 
-// 预先确定当前激活的导航项并获取所有页面
-$currentValue = 'home';
-
-// 获取所有页面用于显示和当前页面检测
-$allPages = $this->widget('Widget_Contents_Page_List');
-
-// 首先遍历所有页面，收集符合条件的页面并检测当前页面
-$filteredPages = array();
-while($allPages->next()) {
-    // 检查是否符合显示条件
-    if (strtolower($allPages->slug) == 'links' or strtolower($allPages->slug) == 'about' or $allPages->fields->headerDisplay == 1) {
-        $filteredPages[] = array(
-            'slug' => $allPages->slug,
-            'title' => $allPages->title,
-            'permalink' => $allPages->permalink,
-            'icon' => $allPages->fields->navIcon ?: 'pages--outlined'
-        );
-    }
-}
-
-// 检测当前是哪种页面类型，按优先级设置当前值
-if ($this->is('index')) {
-    $currentValue = 'home';
-} elseif ($this->is('page')) {
-    // 对于页面，需要检查是哪个具体页面
-    $tempPages = $this->widget('Widget_Contents_Page_List');
-    while($tempPages->next()) {
-        if ($this->is('page', $tempPages->slug)) {
-            $currentValue = $tempPages->slug;
-            break;
-        }
-    }
-}
-?>
-
-<mdui-navigation-rail divider value="<?php echo $currentValue; ?>" alignment="center">
-    <mdui-navigation-rail-item icon="home--outlined" value="home" href="<?php $this->options->siteUrl(); ?>">首页</mdui-navigation-rail-item>
-    <?php if ($this->options->enableIndexPage): ?>
-    <mdui-navigation-rail-item icon="article--outlined" value="archive" href="<?php $this->options->siteUrl(); ?>">文章</mdui-navigation-rail-item>
-    <?php endif; ?>
-    <?php foreach($filteredPages as $page): ?>
-    <mdui-navigation-rail-item icon="<?php echo $page['icon']; ?>" value="<?php echo $page['slug']; ?>" href="<?php echo $page['permalink']; ?>"><?php echo $page['title']; ?></mdui-navigation-rail-item>
-    <?php endforeach; ?>
-</mdui-navigation-rail>
-
-<mdui-top-app-bar>
-    <mdui-button-icon class="mswitch" icon="menu"></mdui-button-icon>
-</mdui-top-app-bar>
-
 <div id="main-index">
     <div class="main-index-title">
         <h2>404 - <?php _e('页面未找到'); ?></h2>

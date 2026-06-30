@@ -74,5 +74,4 @@ $this->need('components/header.php');
 </div>
 
 
-<?php $this->need('components/sidebar.php'); ?>
 <?php $this->need('components/footer.php'); ?>

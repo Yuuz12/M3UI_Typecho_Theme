@@ -13,5 +13,4 @@
     <?php $this->need('components/comments.php'); ?>
 </article>
 
-<?php $this->need('components/sidebar.php'); ?>
 <?php $this->need('components/footer.php'); ?>

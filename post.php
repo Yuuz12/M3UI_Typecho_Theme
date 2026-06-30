@@ -64,20 +64,44 @@
     
     <!-- 文章上下篇导航 -->
     <?php
-    ob_start(); $this->thePrev('%s', ''); $prevHtml = ob_get_clean();
-    preg_match('/href="([^"]*)"[^>]*>(.*?)<\/a>/', $prevHtml, $prevMatch);
-
-    ob_start(); $this->theNext('%s', ''); $nextHtml = ob_get_clean();
-    preg_match('/href="([^"]*)"[^>]*>(.*?)<\/a>/', $nextHtml, $nextMatch);
+    // 使用 cid 作为 created 相同时的次级排序，避免同时间戳文章在上下篇导航中互相跳过
+    $prevPost = \Widget\Contents\From::allocWithAlias(
+        'prev-near:' . $this->cid,
+        ['query' => $this->select()
+            ->where('(table.contents.created < ? OR (table.contents.created = ? AND table.contents.cid < ?))', $this->created, $this->created, $this->cid)
+            ->where('table.contents.status = ?', 'publish')
+            ->where('table.contents.type = ?', $this->type)
+            ->where("table.contents.password IS NULL OR table.contents.password = ''")
+            ->order('table.contents.created', \Typecho\Db::SORT_DESC)
+            ->order('table.contents.cid', \Typecho\Db::SORT_DESC)
+            ->limit(1)
+        ]
+    );
+    $nextPost = \Widget\Contents\From::allocWithAlias(
+        'next-near:' . $this->cid,
+        ['query' => $this->select()
+            ->where('(table.contents.created > ? AND table.contents.created < ?) OR (table.contents.created = ? AND table.contents.cid > ?)', $this->created, $this->options->time, $this->created, $this->cid)
+            ->where('table.contents.status = ?', 'publish')
+            ->where('table.contents.type = ?', $this->type)
+            ->where("table.contents.password IS NULL OR table.contents.password = ''")
+            ->order('table.contents.created', \Typecho\Db::SORT_ASC)
+            ->order('table.contents.cid', \Typecho\Db::SORT_ASC)
+            ->limit(1)
+        ]
+    );
     ?>
     <div class="post-near">
-        <?php if (!empty($prevMatch[1])): ?>
-        <mdui-card variant="outlined" class="post-near-card" href="<?php echo $prevMatch[1]; ?>">
+        <?php if ($prevPost->have()): ?>
+            <?php $prevCover = getCoverImage($prevPost, $this->options); ?>
+        <mdui-card variant="outlined" class="post-near-card" href="<?php echo $prevPost->permalink; ?>">
             <div class="post-near-inner">
+                <div class="post-near-thumb">
+                    <img src="<?php echo $prevCover; ?>" alt="<?php echo htmlspecialchars($prevPost->title, ENT_QUOTES, 'UTF-8'); ?>" loading="lazy">
+                </div>
                 <mdui-icon name="arrow_back" class="post-near-icon"></mdui-icon>
                 <div class="post-near-info">
                     <span class="post-near-label">上一篇</span>
-                    <span class="post-near-title"><?php echo $prevMatch[2]; ?></span>
+                    <span class="post-near-title"><?php echo $prevPost->title; ?></span>
                 </div>
             </div>
         </mdui-card>
@@ -93,14 +117,18 @@
         </mdui-card>
         <?php endif; ?>
 
-        <?php if (!empty($nextMatch[1])): ?>
-        <mdui-card variant="outlined" class="post-near-card post-near-next" href="<?php echo $nextMatch[1]; ?>">
+        <?php if ($nextPost->have()): ?>
+            <?php $nextCover = getCoverImage($nextPost, $this->options); ?>
+        <mdui-card variant="outlined" class="post-near-card post-near-next" href="<?php echo $nextPost->permalink; ?>">
             <div class="post-near-inner">
                 <div class="post-near-info">
                     <span class="post-near-label">下一篇</span>
-                    <span class="post-near-title"><?php echo $nextMatch[2]; ?></span>
+                    <span class="post-near-title"><?php echo $nextPost->title; ?></span>
                 </div>
                 <mdui-icon name="arrow_forward" class="post-near-icon"></mdui-icon>
+                <div class="post-near-thumb">
+                    <img src="<?php echo $nextCover; ?>" alt="<?php echo htmlspecialchars($nextPost->title, ENT_QUOTES, 'UTF-8'); ?>" loading="lazy">
+                </div>
             </div>
         </mdui-card>
         <?php else: ?>

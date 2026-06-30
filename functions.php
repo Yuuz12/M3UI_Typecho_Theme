@@ -264,5 +264,6 @@ function getCoverImage($widget, $options)
     }
 
     // 2. 默认图片
-    return $options->themeUrl('img/empty.png');
+    // 注意：themeUrl() 仅在传入 $theme 参数时返回字符串，否则会直接 echo
+    return $options->themeUrl('img/empty.png', $options->theme);
 }

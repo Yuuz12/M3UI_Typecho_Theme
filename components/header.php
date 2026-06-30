@@ -12,6 +12,48 @@
             'author'   => _t('%s 发布的文章')
         ], '', ' - '); ?><?php $this->options->title(); ?></title>
 
+    <!-- SEO Meta Tags -->
+    <?php if ($this->is('post') || $this->is('page')): ?>
+        <meta name="description" content="<?php echo htmlspecialchars(mb_substr(strip_tags($this->content), 0, 150)); ?>">
+        <?php if ($this->tags): ?>
+            <meta name="keywords" content="<?php echo htmlspecialchars(implode(',', array_column($this->tags, 'name'))); ?>">
+        <?php endif; ?>
+        <link rel="canonical" href="<?php $this->permalink(); ?>">
+        <!-- Open Graph -->
+        <meta property="og:title" content="<?php $this->title(); ?>">
+        <meta property="og:description" content="<?php echo htmlspecialchars(mb_substr(strip_tags($this->content), 0, 150)); ?>">
+        <meta property="og:url" content="<?php $this->permalink(); ?>">
+        <meta property="og:type" content="article">
+        <?php $coverImg = getCoverImage($this, $this->options); ?>
+        <meta property="og:image" content="<?php echo $coverImg; ?>">
+        <meta property="og:site_name" content="<?php $this->options->title(); ?>">
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="<?php $this->title(); ?>">
+        <meta name="twitter:image" content="<?php echo $coverImg; ?>">
+        <!-- JSON-LD -->
+        <script type="application/ld+json">
+        <?php echo json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'BlogPosting',
+            'headline' => $this->title(),
+            'datePublished' => date('c', $this->created),
+            'dateModified' => date('c', $this->modified),
+            'author' => ['@type' => 'Person', 'name' => $this->author->screenName],
+            'image' => $coverImg,
+            'url' => $this->permalink,
+            'mainEntityOfPage' => $this->permalink
+        ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+        </script>
+    <?php elseif ($this->is('index')): ?>
+        <meta name="description" content="<?php $this->options->description(); ?>">
+        <link rel="canonical" href="<?php $this->options->siteUrl(); ?>">
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="<?php $this->options->title(); ?>">
+        <meta property="og:description" content="<?php $this->options->description(); ?>">
+        <meta property="og:url" content="<?php $this->options->siteUrl(); ?>">
+    <?php endif; ?>
+
     <!-- 自有CSS -->
     <link rel="stylesheet" href="<?php $this->options->themeUrl('res/style.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('res/mdui@2.1.4/mdui.css'); ?>">

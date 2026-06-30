@@ -131,6 +131,63 @@ if (switchButton) {
     });
 }
 
+// ==================== 全站搜索 ====================
+
+// 搜索对话框
+const searchDialog = document.getElementById('search-dialog');
+const searchInputs = document.querySelectorAll('.search-trigger');
+const searchCancel = document.getElementById('search-cancel');
+const searchForm = document.getElementById('search-form');
+const searchInput = document.getElementById('search-input');
+
+// 绑定搜索图标点击事件
+searchInputs.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (searchDialog) {
+            searchDialog.open = true;
+            // 等待对话框展开后聚焦输入框
+            setTimeout(function() {
+                if (searchInput) searchInput.focus();
+            }, 300);
+        }
+    });
+});
+
+// 取消按钮
+if (searchCancel) {
+    searchCancel.addEventListener('click', function() {
+        if (searchDialog) searchDialog.open = false;
+    });
+}
+
+// 表单提交
+if (searchForm) {
+    searchForm.addEventListener('submit', function(e) {
+        const keyword = searchInput ? searchInput.value.trim() : '';
+        if (!keyword) {
+            e.preventDefault();
+            return;
+        }
+        // 跳转到搜索结果页
+        e.preventDefault();
+        const formAction = searchForm.getAttribute('action') || window.location.origin;
+        const searchUrl = formAction + (formAction.includes('?') ? '&' : '?') + 's=' + encodeURIComponent(keyword);
+        if (searchDialog) searchDialog.open = false;
+        // 显示进度条
+        const progress = document.getElementById('pjax-progress');
+        if (progress) progress.style.display = 'block';
+        // 使用PJAX加载（如果可用）
+        if (typeof pjax !== 'undefined' && pjax.loadUrl) {
+            window.history.pushState({url: searchUrl}, '', searchUrl);
+            pjax.loadUrl(searchUrl);
+        } else {
+            window.location.href = searchUrl;
+        }
+    });
+}
+
 function scrollToTop() {
     window.scrollTo({
         top: 0,

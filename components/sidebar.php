@@ -36,6 +36,7 @@ if ($this->is('index')) {
 
 <!-- 导航栏 - 在PJAX容器外部，不随页面切换重载 -->
 <mdui-navigation-rail divider value="<?php echo $currentValue; ?>" alignment="center">
+    <mdui-button-icon icon="search" class="search-trigger" slot="bottom"></mdui-button-icon>
     <mdui-navigation-rail-item icon="home--outlined" value="home" href="<?php $this->options->siteUrl(); ?>">首页</mdui-navigation-rail-item>
     <?php if ($this->options->enableIndexPage): ?>
     <mdui-navigation-rail-item icon="article--outlined" value="archive" href="<?php $this->options->siteUrl(); ?>">文章</mdui-navigation-rail-item>
@@ -49,7 +50,9 @@ if ($this->is('index')) {
     <mdui-button-icon class="mswitch" icon="menu"></mdui-button-icon>
     <mdui-top-app-bar-title><?php $this->options->title(); ?></mdui-top-app-bar-title>
     <div style="flex-grow: 1"></div>
-    <mdui-button-icon icon="more_vert"></mdui-button-icon>
+    <mdui-button-icon icon="search" class="search-trigger"></mdui-button-icon>
+    <!-- 更多操作按钮，等后续用的上时再添加 -->
+    <!-- <mdui-button-icon icon="more_vert"></mdui-button-icon> -->
 </mdui-top-app-bar>
 
 <mdui-linear-progress id="pjax-progress" style="position:fixed;top:0;left:0;right:0;z-index:9999;display:none;"></mdui-linear-progress>
@@ -68,3 +71,14 @@ if ($this->is('index')) {
         <?php endforeach; ?>
     </mdui-list>
 </mdui-navigation-drawer>
+
+<!-- 全站搜索对话框 -->
+<mdui-dialog id="search-dialog" close-on-esc close-on-overlay-click>
+    <form method="post" action="<?php $this->options->siteUrl(); ?>" class="search-form" id="search-form">
+        <mdui-text-field variant="outlined" name="s" placeholder="输入关键词搜索..." autofocus class="search-input-field" id="search-input"></mdui-text-field>
+        <div class="search-actions">
+            <mdui-button variant="text" type="button" id="search-cancel">取消</mdui-button>
+            <mdui-button variant="filled" type="submit">搜索</mdui-button>
+        </div>
+    </form>
+</mdui-dialog>

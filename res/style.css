@@ -1323,6 +1323,35 @@ body {
     color: inherit !important;
 }
 
+/* 全站搜索对话框 */
+.search-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 24px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+}
+
+.search-form .search-input-field {
+    width: 100%;
+}
+
+.search-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+@media screen and (max-width: 400px) {
+    .search-form {
+        padding: 16px;
+        gap: 16px;
+        max-width: 100%;
+    }
+}
+
 /* Prism代码块样式 - MDUI重置 */
 pre[class*="language-"],
 pre[data-language] {

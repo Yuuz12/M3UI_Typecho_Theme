@@ -4,7 +4,7 @@
 <head>
     <meta charset="<?php $this->options->charset(); ?>">
     <meta name="renderer" content="webkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php $this->archiveTitle([
             'category' => _t('分类 %s 下的文章'),
             'search'   => _t('包含关键字 %s 的文章'),
@@ -40,7 +40,7 @@
             <mdui-card variant="elevated" id="header-card">
                 <?php $headerImageUrl = trim((string)($this->options->headerImage ?? '')); ?>
                 <?php if (!empty($headerImageUrl)): ?>
-                <img class="img-invert" src="<?php echo htmlspecialchars($headerImageUrl); ?>"></img>
+                <img class="img-invert" src="<?php echo htmlspecialchars($headerImageUrl); ?>" alt="<?php $this->options->title(); ?>">
                 <?php endif; ?>
                 <div class="header-content">
                     <h1 class="img-title"><?php $this->options->title(); ?></h1>

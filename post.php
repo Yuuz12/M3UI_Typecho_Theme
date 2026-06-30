@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <mdui-card variant="elevated" clickable id="header-card">
-                <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>"></img>
+                <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>" alt="<?php $this->options->title(); ?>" loading="lazy">
                 <div class="header-content">
                     <h1 class="img-title"><?php $this->title() ?></h1>
                     <h2 class="img-description"><?php $this->author(); ?> / <?php $this->date('Y-m-d'); ?></h2>

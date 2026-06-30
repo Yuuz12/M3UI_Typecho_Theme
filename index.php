@@ -20,7 +20,7 @@ $this->need('components/header.php');
         <div class="post-grid">
         <?php while ($this->next()): ?>
             <mdui-card clickable variant="elevated" class="post-card" href="<?php $this->permalink() ?>" itemscope itemtype="http://schema.org/BlogPosting">
-                <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>"></img>
+                <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>" alt="<?php $this->title() ?>" loading="lazy">
                 <div class="post-card-info">
                     <span class="post-title"><?php $this->title() ?></span>
                     <div class="post-meta-chips">

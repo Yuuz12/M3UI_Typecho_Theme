@@ -102,7 +102,7 @@ $tagCount = count($tagSet);
             ?>
             
             <mdui-card clickable variant="elevated" class="post-card" href="<?php $archives->permalink() ?>" itemscope itemtype="http://schema.org/BlogPosting">
-                <img class="img-invert" src="<?php echo getCoverImage($archives, $this->options); ?>"></img>
+                <img class="img-invert" src="<?php echo getCoverImage($archives, $this->options); ?>" alt="<?php $archives->title() ?>" loading="lazy">
                 <div class="post-card-info">
                     <span class="post-title"><?php $archives->title() ?></span>
                     <div class="post-meta-chips">

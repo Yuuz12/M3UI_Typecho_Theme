@@ -1352,6 +1352,82 @@ body {
     }
 }
 
+/* 文章上下篇导航 */
+.post-near {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.post-near-card {
+    padding: 16px;
+    box-sizing: border-box;
+    min-width: 0;
+    transition: box-shadow 0.2s ease;
+}
+
+.post-near-card:not(.post-near-disabled) {
+    cursor: pointer;
+}
+
+.post-near-card:not(.post-near-disabled):hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.post-near-disabled {
+    opacity: 0.45;
+}
+
+.post-near-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+}
+
+.post-near-icon {
+    font-size: 20px;
+    color: rgb(var(--mdui-color-primary));
+    flex-shrink: 0;
+}
+
+.post-near-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.post-near-label {
+    font-size: 12px;
+    color: rgb(var(--mdui-color-on-surface-variant));
+}
+
+.post-near-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgb(var(--mdui-color-on-surface));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.post-near-next .post-near-info {
+    align-items: flex-end;
+    text-align: right;
+}
+
+@media screen and (max-width: 768px) {
+    .post-near {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Prism代码块样式 - MDUI重置 */
 pre[class*="language-"],
 pre[data-language] {

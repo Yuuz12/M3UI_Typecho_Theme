@@ -61,13 +61,63 @@
     </div>
     
     <?php $this->need("components/list-template.php");?>
+    
+    <!-- 文章上下篇导航 -->
+    <?php
+    ob_start(); $this->thePrev('%s', ''); $prevHtml = ob_get_clean();
+    preg_match('/href="([^"]*)"[^>]*>(.*?)<\/a>/', $prevHtml, $prevMatch);
+
+    ob_start(); $this->theNext('%s', ''); $nextHtml = ob_get_clean();
+    preg_match('/href="([^"]*)"[^>]*>(.*?)<\/a>/', $nextHtml, $nextMatch);
+    ?>
+    <div class="post-near">
+        <?php if (!empty($prevMatch[1])): ?>
+        <mdui-card variant="outlined" class="post-near-card" href="<?php echo $prevMatch[1]; ?>">
+            <div class="post-near-inner">
+                <mdui-icon name="arrow_back" class="post-near-icon"></mdui-icon>
+                <div class="post-near-info">
+                    <span class="post-near-label">上一篇</span>
+                    <span class="post-near-title"><?php echo $prevMatch[2]; ?></span>
+                </div>
+            </div>
+        </mdui-card>
+        <?php else: ?>
+        <mdui-card variant="outlined" class="post-near-card post-near-disabled">
+            <div class="post-near-inner">
+                <mdui-icon name="arrow_back" class="post-near-icon"></mdui-icon>
+                <div class="post-near-info">
+                    <span class="post-near-label">上一篇</span>
+                    <span class="post-near-title">已是最新</span>
+                </div>
+            </div>
+        </mdui-card>
+        <?php endif; ?>
+
+        <?php if (!empty($nextMatch[1])): ?>
+        <mdui-card variant="outlined" class="post-near-card post-near-next" href="<?php echo $nextMatch[1]; ?>">
+            <div class="post-near-inner">
+                <div class="post-near-info">
+                    <span class="post-near-label">下一篇</span>
+                    <span class="post-near-title"><?php echo $nextMatch[2]; ?></span>
+                </div>
+                <mdui-icon name="arrow_forward" class="post-near-icon"></mdui-icon>
+            </div>
+        </mdui-card>
+        <?php else: ?>
+        <mdui-card variant="outlined" class="post-near-card post-near-next post-near-disabled">
+            <div class="post-near-inner">
+                <div class="post-near-info">
+                    <span class="post-near-label">下一篇</span>
+                    <span class="post-near-title">已是最早</span>
+                </div>
+                <mdui-icon name="arrow_forward" class="post-near-icon"></mdui-icon>
+            </div>
+        </mdui-card>
+        <?php endif; ?>
+    </div>
+    
     <?php $this->need('components/comments.php'); ?>
-    
-    <!-- <ul class="post-near">
-        <li>上一篇: <?php $this->thePrev('%s', '没有了'); ?></li>
-        <li>下一篇: <?php $this->theNext('%s', '没有了'); ?></li>
-    </ul> -->
-    
+
 </article>
 
 <?php $this->need('components/footer.php'); ?>

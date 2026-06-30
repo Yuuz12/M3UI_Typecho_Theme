@@ -54,6 +54,9 @@
         <meta property="og:url" content="<?php $this->options->siteUrl(); ?>">
     <?php endif; ?>
 
+    <!-- 预加载关键字体 -->
+    <link rel="preload" href="<?php $this->options->themeUrl('res/fonts/AlimamaFangYuanTiVF-Thin-2.woff2'); ?>" as="font" type="font/woff2" crossorigin>
+
     <!-- 自有CSS -->
     <link rel="stylesheet" href="<?php $this->options->themeUrl('res/style.css'); ?>">
     <link rel="stylesheet" href="<?php $this->options->themeUrl('res/mdui@2.1.4/mdui.css'); ?>">
@@ -94,9 +97,6 @@
 </header><!-- end #header -->
 <?php endif; ?>
 
-<!-- 代码高亮JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
 
 <!-- 自定义配色方案脚本 -->
 <script>

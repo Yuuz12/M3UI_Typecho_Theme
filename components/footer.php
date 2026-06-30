@@ -35,6 +35,20 @@
 </footer>
 
 <?php $this->footer(); ?>
+
+<!-- 代码高亮：仅文章/页面含代码块时加载 -->
+<?php
+$content = $this->is('post') || $this->is('page') ? $this->content : '';
+$hasCode = is_string($content) && (strpos($content, '<pre') !== false || strpos($content, '<code') !== false);
+?>
+<?php if ($hasCode): ?>
+<!-- 代码高亮核心自动按需加载 -->
+<script src="<?php $this->options->themeUrl('res/prism/prism-core.min.js'); ?>"></script>
+<script>Prism.plugins.autoloader = {languages_path: '<?php $this->options->themeUrl('res/prism/'); ?>', use_minified: true, loadLanguages: function(){}}; </script>
+<script src="<?php $this->options->themeUrl('res/prism/prism-autoloader.min.js'); ?>"></script>
+<script>Prism.plugins.autoloader.languages_path = '<?php $this->options->themeUrl('res/prism/'); ?>';</script>
+<?php endif; ?>
+
 <script src="<?php $this->options->themeUrl('res/spotlight.bundle.js'); ?>"></script>
 <script src="<?php $this->options->themeUrl('res/script.js'); ?>"></script>
 

@@ -47,6 +47,11 @@
                 ?>
                 <mdui-chip icon="label">无标签</mdui-chip>
                 <?php endif; ?>
+                <?php
+                    $wordCount = mb_strlen(strip_tags($this->content));
+                    $readingMinutes = max(1, ceil($wordCount / 300));
+                ?>
+                <mdui-chip icon="schedule" disabled><?php echo $readingMinutes; ?> 分钟阅读</mdui-chip>
             </div>
             <div class="mdui-prose">
             <?php echo parseMduiNotes($this->content); ?>

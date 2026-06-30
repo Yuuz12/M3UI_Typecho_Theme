@@ -89,7 +89,7 @@ function showToast(text) {
     if (typeof mdui !== 'undefined') {
         mdui.snackbar({
             message: text,
-            placement: 'top',
+            placement: 'bottom',
             autoCloseDelay: 3000
         });
     }
@@ -597,6 +597,25 @@ function initSpotlight() {
     });
 }
 
+// 代码块复制按钮
+function initCodeBlockCopy() {
+    const pres = document.querySelectorAll('.main-post-content pre');
+    pres.forEach(function(pre) {
+        if (pre.querySelector('.code-copy-btn')) return;
+        const btn = document.createElement('mdui-button-icon');
+        btn.setAttribute('icon', 'content_copy');
+        btn.className = 'code-copy-btn';
+        btn.addEventListener('click', function() {
+            navigator.clipboard.writeText(pre.textContent).then(function() {
+                showToast('已复制');
+            }).catch(function() {
+                showToast('复制失败');
+            });
+        });
+        pre.appendChild(btn);
+    });
+}
+
 // 页面加载完成后初始化
 function onPageReady() {
     // 初始化Spotlight
@@ -611,6 +630,9 @@ function onPageReady() {
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
     }
+
+    // 代码块复制按钮
+    initCodeBlockCopy();
 }
 
 if (document.readyState === 'loading') {
@@ -816,6 +838,9 @@ function reinitializeAfterPjax() {
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
     }
+
+    // 代码块复制按钮
+    initCodeBlockCopy();
 
     // 重新初始化Spotlight
     initSpotlight();

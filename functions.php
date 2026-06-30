@@ -249,11 +249,11 @@ function parseMduiCollapse($html)
 
 /**
  * 获取文章封面图
- * 优先级：自定义字段 indexCardImage > 默认图 img/empty.png
+ * 优先级：自定义字段 indexCardImage > 渐变占位（根据标题hash生成SVG）
  * 
  * @param Widget $widget 文章组件对象（$this 或 $archives）
  * @param Widget_Options $options 主题选项对象（$this->options）
- * @return string 图片URL
+ * @return string 图片URL或data URI
  */
 function getCoverImage($widget, $options)
 {
@@ -263,7 +263,36 @@ function getCoverImage($widget, $options)
         return $customImage;
     }
 
-    // 2. 默认图片
-    // 注意：themeUrl() 仅在传入 $theme 参数时返回字符串，否则会直接 echo
-    return $options->themeUrl('img/empty.png', $options->theme);
+    // 2. 生成渐变占位的 SVG data URI
+    $title = $widget->title ?? '';
+    $hash = md5($title);
+    
+    // Material 3 配色选择
+    $colorPairs = [
+        ['#E8DEF8', '#FCE4EC'],
+        ['#D0BCFF', '#F8BBD0'],
+        ['#C8E6C9', '#E8F5E9'],
+        ['#BBDEFB', '#E3F2FD'],
+        ['#FFF9C4', '#FFFDE7'],
+        ['#FFCCBC', '#FBE9E7'],
+        ['#E0BBE4', '#F3E5F5'],
+        ['#A5D6A7', '#E8F5E9'],
+        ['#90CAF9', '#BBDEFB'],
+        ['#AB47BC', '#CE93D8'],
+        ['#4DB6AC', '#B2DFDB'],
+        ['#9575CD', '#B39DDB'],
+        ['#F06292', '#F48FB1'],
+        ['#7986CB', '#9FA8DA'],
+        ['#A1887F', '#BCAAA4'],
+        ['#F9A825', '#FFD54F'],
+    ];
+    
+    $pairIndex = hexdec(substr($hash, 0, 8)) % count($colorPairs);
+    $colors = $colorPairs[$pairIndex];
+    
+    $angle = (hexdec(substr($hash, 2, 4)) % 360);
+    
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%" gradientTransform="rotate(' . $angle . ')"><stop offset="0%" style="stop-color:' . $colors[0] . '"/><stop offset="100%" style="stop-color:' . $colors[1] . '"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>';
+    
+    return 'data:image/svg+xml;base64,' . base64_encode($svg);
 }

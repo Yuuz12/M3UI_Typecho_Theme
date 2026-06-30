@@ -121,18 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-
-    // 为所有代码块添加语言标识
-    const pres = document.querySelectorAll('pre[class*="language-"]');
-    pres.forEach(function(pre) {
-        // 提取语言名称
-        const classes = pre.className.split(' ');
-        const languageClass = classes.find(cls => cls.startsWith('language-'));
-        if (languageClass) {
-            const languageName = languageClass.replace('language-', '').toUpperCase();
-            pre.setAttribute('data-language', languageName);
-        }
-    });
 });
 
 // 辅助函数：将十六进制颜色转换为RGB值

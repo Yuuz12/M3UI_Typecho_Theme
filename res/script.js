@@ -607,16 +607,7 @@ function onPageReady() {
         setupCommentForm();
     }
 
-    // 为代码块添加语言标识并高亮
-    const pres = document.querySelectorAll('pre[class*="language-"]');
-    pres.forEach(function(pre) {
-        const classes = pre.className.split(' ');
-        const languageClass = classes.find(cls => cls.startsWith('language-'));
-        if (languageClass) {
-            const languageName = languageClass.replace('language-', '').toUpperCase();
-            pre.setAttribute('data-language', languageName);
-        }
-    });
+    // 代码高亮：Prism hook 会自动设置 data-language，只需调用 highlightAll
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
     }
@@ -821,18 +812,7 @@ function reinitializeAfterPjax() {
         });
     }
 
-    // 为所有代码块添加语言标识（必须在 Prism.highlightAll 之前）
-    const pres = document.querySelectorAll('pre[class*="language-"]');
-    pres.forEach(function(pre) {
-        const classes = pre.className.split(' ');
-        const languageClass = classes.find(cls => cls.startsWith('language-'));
-        if (languageClass) {
-            const languageName = languageClass.replace('language-', '').toUpperCase();
-            pre.setAttribute('data-language', languageName);
-        }
-    });
-
-    // 重新初始化代码高亮
+    // 重新初始化代码高亮（Prism hook 会自动设置 data-language）
     if (typeof Prism !== 'undefined') {
         Prism.highlightAll();
     }

@@ -80,6 +80,17 @@
 
     <!-- 通过自有函数输出HTML头部信息 -->
     <?php $this->header(); ?>
+
+    <!-- 内容宽度 CSS 变量 -->
+    <style>:root { 
+        --m3ui-content-width: <?php echo intval($this->options->contentWidth) ?: 1200; ?>px;
+        --post-card-columns: <?php echo intval($this->options->postCardColumns) ?: 3; ?>;
+    }</style>
+
+    <!-- 自定义 CSS -->
+    <?php if ($this->options->customCSS): ?>
+        <style><?php echo $this->options->customCSS; ?></style>
+    <?php endif; ?>
 </head>
 <body>
 

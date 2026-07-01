@@ -1,4 +1,4 @@
-﻿﻿/* ------------------
+﻿/* ------------------
  * Global style
  * --------------- */
 
@@ -58,7 +58,7 @@ body {
 .main-index-title {
     display: block;
     margin: 0 auto 0 40px;
-    max-width: 1200px;
+    max-width: var(--m3ui-content-width, 1200px);
     line-height: 0.7;
     font-size: 32px;
     font-family: 'Smiley';
@@ -66,7 +66,7 @@ body {
 .main-post-title {
     display: block;
     margin: 0;
-    max-width: 1200px;
+    max-width: var(--m3ui-content-width, 1200px);
     font-size: 32px;
 }
 
@@ -243,7 +243,7 @@ body {
     }
     #main-index, #main-post {
         margin: auto auto 5rem;
-        max-width: 1200px;
+        max-width: var(--m3ui-content-width, 1200px);
     }
     
     .post-content-container {
@@ -295,7 +295,7 @@ body {
     }
     .post-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(var(--post-card-columns, 3), 1fr) !important;
         gap: 16px;
     }
     .post-card {
@@ -321,7 +321,7 @@ body {
     #footer {
         margin: 0 auto;
         padding-top: 3rem;
-        max-width: 1200px;
+        max-width: var(--m3ui-content-width, 1200px);
         height: 25vh;
     }
     #footer a {
@@ -419,7 +419,7 @@ body {
     
     /* 平板设备归档页面样式 */
     .post-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(min(var(--post-card-columns, 3), 2), 1fr) !important;
         gap: 12px !important;
     }
 
@@ -563,10 +563,12 @@ body {
 #main-index {
     margin: auto auto 5rem;
     width: 100%;
+    max-width: var(--m3ui-content-width, 1200px);
 }
 #main-post {
     margin: auto auto 5rem;
     width: 95%;
+    max-width: var(--m3ui-content-width, 1200px);
 }
 .main-post-content img {
     width: 100%;
@@ -589,7 +591,7 @@ body {
 }
 .post-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(min(var(--post-card-columns, 3), 2), 1fr);
     gap: 12px;
 }
 .post-card {
@@ -1466,8 +1468,8 @@ ol ol, ul ol {
 
 @media screen and (max-width: 767px) {
     .post-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
     }
     .post-card {
         min-height: 300px;

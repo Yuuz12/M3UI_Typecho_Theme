@@ -36,6 +36,16 @@
 
 <?php $this->footer(); ?>
 
+<!-- 统计代码 -->
+<?php if ($this->options->analyticsCode): ?>
+    <?php echo $this->options->analyticsCode; ?>
+<?php endif; ?>
+
+<!-- 自定义 JS -->
+<?php if ($this->options->customJS): ?>
+    <script><?php echo $this->options->customJS; ?></script>
+<?php endif; ?>
+
 <!-- 代码高亮核心 -->
 <script src="<?php $this->options->themeUrl('res/prism/prism-core.min.js'); ?>"></script>
 <script src="<?php $this->options->themeUrl('res/prism/prism-autoloader.min.js'); ?>"></script>

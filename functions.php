@@ -90,6 +90,46 @@ function themeConfig($form)
         _t('设置默认的颜色模式，用户可在前台手动切换并持久化')
     );
 
+    $contentWidth = new \Typecho\Widget\Helper\Form\Element\Text(
+        'contentWidth',
+        null,
+        '1200',
+        _t('内容区最大宽度'),
+        _t('设置正文区域的最大宽度（像素），默认为 1200')
+    );
+
+    $postCardColumns = new \Typecho\Widget\Helper\Form\Element\Text(
+        'postCardColumns',
+        null,
+        '3',
+        _t('首页文章卡片列数'),
+        _t('设置首页文章卡片在桌面端显示的列数，默认为 3')
+    );
+
+    $customCSS = new \Typecho\Widget\Helper\Form\Element\Textarea(
+        'customCSS',
+        null,
+        null,
+        _t('自定义 CSS'),
+        _t('在这里填入自定义 CSS 代码，将直接注入到页面头部 style 标签中')
+    );
+
+    $customJS = new \Typecho\Widget\Helper\Form\Element\Textarea(
+        'customJS',
+        null,
+        null,
+        _t('自定义 JS'),
+        _t('在这里填入自定义 JavaScript 代码，将直接注入到页面底部 script 标签中')
+    );
+
+    $analyticsCode = new \Typecho\Widget\Helper\Form\Element\Textarea(
+        'analyticsCode',
+        null,
+        null,
+        _t('统计代码'),
+        _t('在这里填入统计代码（如 Google Analytics、百度统计等），将直接注入到页面底部')
+    );
+
     $form->addInput($logoUrl);
     $form->addInput($headerImage);
     $form->addInput($enableIndexPage);
@@ -100,6 +140,11 @@ function themeConfig($form)
     $form->addInput($bangumiID);
     $form->addInput($bangumiApiProxy);
     $form->addInput($bangumiImgProxy);
+    $form->addInput($contentWidth);
+    $form->addInput($postCardColumns);
+    $form->addInput($customCSS);
+    $form->addInput($customJS);
+    $form->addInput($analyticsCode);
 
     $sidebarBlock = new \Typecho\Widget\Helper\Form\Element\Checkbox(
         'sidebarBlock',

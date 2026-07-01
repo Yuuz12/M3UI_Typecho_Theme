@@ -234,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (document.querySelector('#main-post')) {
         generateTableOfContents();
         setupSmoothScrolling();
-        setupIntersectionObserver();
+        setupScrollSpy();
     }
 });
 
@@ -416,29 +416,71 @@ function setupSmoothScrolling() {
 }
 
 // 设置交叉观察器以跟踪当前活动的目录项
-function setupIntersectionObserver() {
-    const headings = document.querySelectorAll('.main-post-content h1, .main-post-content h2, .main-post-content h3, .main-post-content h4, .main-post-content h5, .main-post-content h6');
+// 滚动监听，更新目录激活状态
+function setupScrollSpy() {
+    const headings = Array.from(document.querySelectorAll('.main-post-content h1, .main-post-content h2, .main-post-content h3, .main-post-content h4, .main-post-content h5, .main-post-content h6'));
     
     if (headings.length === 0) return;
     
-    // 选项用于交叉观察器
-    const options = {
-        rootMargin: '-20% 0px -80% 0px', // 当元素在视口的前20%位置时触发
-        threshold: 0
+    let ticking = false;
+    
+    // 移除之前可能存在的滚动监听（通过标记函数）
+    if (window._m3uiScrollHandler) {
+        window.removeEventListener('scroll', window._m3uiScrollHandler, { passive: true });
+    }
+    
+    // 监听滚动事件
+    const onScroll = () => {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                updateActiveTocOnScroll(headings);
+                ticking = false;
+            });
+            ticking = true;
+        }
     };
     
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                updateActiveTocItem(entry.target.id);
-            }
-        });
-    }, options);
+    window._m3uiScrollHandler = onScroll;
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // 初始化一次
+    updateActiveTocOnScroll(headings);
+}
+
+// 根据滚动位置更新激活的目录项
+function updateActiveTocOnScroll(headings) {
+    const scrollY = window.scrollY;
+    const offset = 100; // 偏移量，考虑固定头部等
     
-    // 观察所有标题
-    headings.forEach(heading => {
-        observer.observe(heading);
-    });
+    let currentId = '';
+    
+    // 找到当前滚动位置下方最近的标题
+    for (let i = 0; i < headings.length; i++) {
+        const heading = headings[i];
+        const headingTop = heading.getBoundingClientRect().top + scrollY;
+        
+        if (headingTop - offset <= scrollY) {
+            currentId = heading.id;
+        } else {
+            break;
+        }
+    }
+    
+    // 如果还没到第一个标题，不激活任何项
+    if (!currentId && headings.length > 0) {
+        const firstHeadingTop = headings[0].getBoundingClientRect().top + scrollY;
+        if (firstHeadingTop - offset > scrollY) {
+            // 在第一个标题之前，不激活任何项
+            document.querySelectorAll('#toc-content .item').forEach(item => {
+                item.classList.remove('toc-active');
+            });
+            return;
+        }
+    }
+    
+    // 更新激活状态
+    if (currentId) {
+        updateActiveTocItem(currentId);
+    }
 }
 
 // 更新活动的目录项
@@ -915,7 +957,7 @@ function reinitializeAfterPjax() {
     if (mainPost) {
         generateTableOfContents();
         setupSmoothScrolling();
-        setupIntersectionObserver();
+        setupScrollSpy();
     }
 
     // 重新设置评论表单

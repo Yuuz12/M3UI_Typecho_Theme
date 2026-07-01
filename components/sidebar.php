@@ -7,7 +7,7 @@ $allPages = $this->widget('Widget_Contents_Page_List');
 $filteredPages = array();
 
 while($allPages->next()) {
-    if (strtolower($allPages->slug) == 'links' or strtolower($allPages->slug) == 'about' or $allPages->fields->headerDisplay == 1) {
+    if ($allPages->fields->headerDisplay == 1) {
         $filteredPages[] = array(
             'slug' => $allPages->slug,
             'title' => $allPages->title,

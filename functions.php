@@ -163,6 +163,7 @@ function mduiStyleCardsEditor($content)
  * [m3ui_warning]文本[/m3ui_warning] -> 黄色警告提示卡片
  * [m3ui_success]文本[/m3ui_success] -> 绿色成功提示卡片
  * [m3ui_collapse title="标题"]内容[/m3ui_collapse] -> 折叠面板（支持嵌套）
+ * [m3ui_gallery][m3ui_image src="URL" caption="说明"][/m3ui_gallery] -> 图片灯箱画廊
  */
 function parseMduiNotes($html)
 {
@@ -173,6 +174,34 @@ function parseMduiNotes($html)
     ];
     $html = preg_replace(array_keys($maps), array_values($maps), $html);
 
+    // 图片灯箱短代码：[m3ui_gallery]包裹的[m3ui_image]分组
+    $html = preg_replace_callback('/\[m3ui_gallery\](.*?)\[\/m3ui_gallery\]/s', function($m) {
+        $content = $m[1];
+        // 清理 Markdown 插入的 <p> 和 <br>
+        $content = preg_replace('#<p>\s*#i', '', $content);
+        $content = preg_replace('#\s*</p>\s*#i', '', $content);
+        $content = preg_replace('#<br\s*/?>#i', '', $content);
+
+        preg_match_all('/\[m3ui_image\s+src="([^"]*)"(?:\s+caption="([^"]*)")?\]/', $content, $imgMatches, PREG_SET_ORDER);
+        $count = count($imgMatches);
+        if ($count === 0) return '';
+
+        $items = '';
+        foreach ($imgMatches as $img) {
+            $src = $img[1];
+            $caption = !empty($img[2]) ? $img[2] : '';
+            $items .= '<mdui-card variant="elevated" class="m3ui-gallery-item">';
+            $items .= '<img src="' . htmlspecialchars($src) . '" alt="' . htmlspecialchars($caption) . '" class="spotlight" data-caption="' . htmlspecialchars($caption) . '">';
+            if ($caption) {
+                $items .= '<div class="m3ui-gallery-caption">' . htmlspecialchars($caption) . '</div>';
+            }
+            $items .= '</mdui-card>';
+        }
+        // 列数：1张=1列，2张=2列，3张=3列，4张=2列，5张以上=3列
+        $cols = $count <= 1 ? 1 : ($count === 2 ? 2 : ($count === 4 ? 2 : 3));
+        return '<div class="m3ui-gallery m3ui-gallery-' . $count . '" style="grid-template-columns: repeat(' . $cols . ', 1fr);">' . $items . '</div>';
+    }, $html);
+
     // 折叠面板短代码：使用栈式解析器处理嵌套（正则在跨 <p> 标签时会失败）
     $html = parseMduiCollapse($html);
 
@@ -180,6 +209,9 @@ function parseMduiNotes($html)
     $html = preg_replace('#</mdui-card>\s*<br\s*/?>\s*<mdui-card#', '</mdui-card><mdui-card', $html);
     // 清理包裹 mdui-list 的 <p> 标签（块级元素会被浏览器从 <p> 中拆出）
     $html = preg_replace('#<p>\s*(<mdui-list>.*?</mdui-list>)\s*</p>#s', '$1', $html);
+    // 清理包裹 m3ui-quote 和 m3ui-gallery 的 <p> 标签
+    $html = preg_replace('#<p>\s*(<figure class="m3ui-quote">.*?</figure>)\s*</p>#s', '$1', $html);
+    $html = preg_replace('#<p>\s*(<div class="m3ui-gallery[^"]*">.*?</div>)\s*</p>#s', '$1', $html);
     $html = preg_replace('#<p>\s*</p>#', '', $html);
     return $html;
 }

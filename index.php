@@ -4,7 +4,7 @@
  *
  * @package M3UI
  * @author Yuuz12
- * @version 1.1.9
+ * @version 1.2.0
  * @link https://yuuz12.top
  */
 

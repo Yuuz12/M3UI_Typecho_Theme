@@ -100,6 +100,27 @@ $themeUrl = $options->themeUrl;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
+    function insertImage() {
+        var textarea = document.getElementById('text');
+        if (!textarea) return;
+
+        var urlText = '图片URL';
+        var captionText = '图片说明';
+        var shortcode = '[m3ui_gallery]\n[m3ui_image src="' + urlText + '" caption="' + captionText + '"]\n[m3ui_image src="' + urlText + '" caption="' + captionText + '"]\n[/m3ui_gallery]';
+
+        var start = textarea.selectionStart;
+        var end   = textarea.selectionEnd;
+        var text  = textarea.value;
+        textarea.value = text.substring(0, start) + shortcode + text.substring(end);
+
+        var urlStart = start + '[m3ui_gallery]\n[m3ui_image src="'.length;
+        textarea.selectionStart = urlStart;
+        textarea.selectionEnd = urlStart + urlText.length;
+        textarea.focus();
+
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
     function initButton() {
         var row = document.getElementById('wmd-button-row');
         if (!row) return;
@@ -166,6 +187,26 @@ $themeUrl = $options->themeUrl;
             menu.style.display = 'none';
         });
         menu.appendChild(collapseItem);
+
+        // 分隔线
+        var divider2 = document.createElement('mdui-divider');
+        menu.appendChild(divider2);
+
+        // 图片灯箱选项
+        var imageItem = document.createElement('mdui-menu-item');
+        imageItem.setAttribute('value', 'image');
+        var imageIcon = document.createElement('mdui-icon');
+        imageIcon.setAttribute('slot', 'icon');
+        imageIcon.setAttribute('name', 'photo_library');
+        imageIcon.style.color = '#5e5e5e';
+        imageItem.appendChild(imageIcon);
+        imageItem.appendChild(document.createTextNode('图片灯箱'));
+        imageItem.addEventListener('click', function(e) {
+            e.stopPropagation();
+            insertImage();
+            menu.style.display = 'none';
+        });
+        menu.appendChild(imageItem);
 
         wrap.appendChild(btn);
         wrap.appendChild(menu);

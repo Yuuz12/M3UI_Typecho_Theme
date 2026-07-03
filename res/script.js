@@ -607,9 +607,16 @@ function setupCommentForm() {
 
 // 初始化Spotlight图片查看器
 function initSpotlight() {
-    // 为文章内容中的图片添加spotlight类
+    // 为文章内容中的图片添加懒加载、异步解码和spotlight类
     const images = document.querySelectorAll('.main-post-content img');
     images.forEach(img => {
+        // 懒加载 + 异步解码
+        if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
+        }
+        if (!img.hasAttribute('decoding')) {
+            img.setAttribute('decoding', 'async');
+        }
         // 排除某些特定类的图片
         if (!img.classList.contains('bq') && !img.classList.contains('no-spotlight')) {
             img.classList.add('spotlight');

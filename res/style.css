@@ -1,4 +1,4 @@
-﻿/* ------------------
+/* ------------------
  * Global style
  * --------------- */
 
@@ -1053,6 +1053,20 @@ body {
 .post-meta-row mdui-chip a:hover {
     text-decoration: none !important;
     color: inherit !important;
+}
+
+/* 文章分享按钮 */
+.post-share {
+    margin-left: auto;
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+@media screen and (max-width: 767px) {
+    .post-share mdui-button-icon {
+        --mdui-button-icon-size: 36px;
+    }
 }
 
 /* 全站搜索对话框 */

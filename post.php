@@ -49,9 +49,13 @@
                 <?php endif; ?>
                 <?php
                     $wordCount = mb_strlen(strip_tags($this->content));
-                    $readingMinutes = max(1, ceil($wordCount / 300));
+                    $readingMinutes = max(1, ceil($wordCount / 400));
                 ?>
                 <mdui-chip icon="schedule" disabled><?php echo $readingMinutes; ?> 分钟阅读</mdui-chip>
+                <div class="post-share">
+                    <mdui-button-icon icon="content_copy" class="share-btn" data-action="copy-link" title="复制文章链接"></mdui-button-icon>
+                    <mdui-button-icon icon="share" class="share-btn" data-action="native-share" title="分享"></mdui-button-icon>
+                </div>
             </div>
             <div class="mdui-prose">
             <?php echo parseMduiNotes($this->content); ?>

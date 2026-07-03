@@ -663,6 +663,11 @@ function onPageReady() {
     // 初始化Spotlight
     initSpotlight();
 
+    // 文章分享按钮
+    if (document.querySelector('.post-share')) {
+        initShareButtons();
+    }
+
     // 设置评论表单
     if (document.querySelector('#comments')) {
         setupCommentForm();
@@ -675,6 +680,64 @@ function onPageReady() {
 
     // 代码块复制按钮
     initCodeBlockCopy();
+}
+
+// ==================== 文章分享按钮 ====================
+
+function initShareButtons() {
+    // 复制链接
+    document.querySelectorAll('[data-action="copy-link"]').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', function() {
+            var url = location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showToast('文章链接已复制');
+                }).catch(function() {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+        });
+    });
+
+    // 原生分享
+    document.querySelectorAll('[data-action="native-share"]').forEach(function(btn) {
+        if (btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        // 不支持 navigator.share 时隐藏按钮
+        if (!navigator.share) {
+            btn.style.display = 'none';
+            return;
+        }
+        btn.addEventListener('click', function() {
+            navigator.share({
+                title: document.title,
+                url: location.href,
+                text: document.querySelector('meta[name="description"]')?.content || ''
+            }).catch(function() {
+                // 用户取消分享或无操作时不提示
+            });
+        });
+    });
+}
+
+function fallbackCopy(text) {
+    var textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showToast('链接已复制');
+    } catch (e) {
+        showToast('复制失败');
+    }
+    document.body.removeChild(textarea);
 }
 
 // ==================== 主题模式切换 ====================
@@ -951,6 +1014,11 @@ function reinitializeAfterPjax() {
 
     // 重新初始化Spotlight
     initSpotlight();
+
+    // 重新初始化文章分享按钮
+    if (document.querySelector('.post-share')) {
+        initShareButtons();
+    }
 
     // 如果在文章页面，重新生成目录
     const mainPost = document.querySelector('#main-post');

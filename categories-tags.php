@@ -91,7 +91,7 @@ $tagCount = count($tags);
                 <?php foreach ($categories as $cat): ?>
                 <mdui-card variant="elevated" class="ct-category-card" clickable href="<?php echo $cat['permalink']; ?>">
                     <div class="ct-category-header">
-                        <mdui-icon name="folder_open" class="ct-category-icon"></mdui-icon>
+                        <mdui-icon name="folder" class="ct-category-icon"></mdui-icon>
                         <span class="ct-category-name"><?php echo htmlspecialchars($cat['name']); ?></span>
                         <span class="ct-category-count"><?php echo $cat['count']; ?></span>
                     </div>

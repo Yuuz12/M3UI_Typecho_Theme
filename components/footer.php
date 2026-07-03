@@ -7,6 +7,7 @@
 </div><!-- end #pjax-container -->
 
 <div class="scrollToTopBtn-wrapper">
+    <div class="reading-progress-ring" aria-hidden="true"></div>
     <mdui-fab icon="keyboard_arrow_up" class="scrollToTopBtn"></mdui-fab>
 </div>
 

@@ -39,6 +39,11 @@ body {
     bottom: 16px;
     right: 16px;
     z-index: 100;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     opacity: 0;
     transform: translateY(80px) scale(0.6);
     pointer-events: none;
@@ -49,6 +54,25 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
+}
+
+/* 阅读进度环：方圆形，贴合 mdui-fab 轮廓，在 FAB 内圈显示 */
+.reading-progress-ring {
+    position: absolute;
+    inset: 0; /* 紧贴 FAB 内边缘，不留空隙 */
+    border-radius: var(--mdui-shape-corner-large);
+    background: conic-gradient(
+        rgba(var(--mdui-color-on-primary-container), 0.7) var(--progress, 0deg),
+        rgba(var(--mdui-color-on-surface), 0.08) 0deg
+    );
+    pointer-events: none;
+    z-index: 2; /* 在 FAB 上方 */
+    padding: 3px; /* 环宽 */
+    -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000) padding-box;
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000) padding-box;
+    mask-composite: exclude;
+    transition: background 0.1s linear;
 }
 
 .divider svg path {
@@ -585,6 +609,29 @@ body {
 .main-post-content img:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+/* 暗色模式下文章图片降低亮度 */
+.mdui-theme-dark .main-post-content img:not(.no-dim):not(.bq) {
+    filter: brightness(0.85);
+    transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mdui-theme-dark .main-post-content img:hover:not(.no-dim):not(.bq) {
+    filter: brightness(1);
+}
+
+/* auto 模式下跟随系统暗色 */
+@media (prefers-color-scheme: dark) {
+    .mdui-theme-auto .main-post-content img:not(.no-dim):not(.bq) {
+        filter: brightness(0.85);
+        transition: filter 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mdui-theme-auto .main-post-content img:hover:not(.no-dim):not(.bq) {
+        filter: brightness(1);
+    }
+}
+
 .collect {
     margin: auto;
     width: 95%;

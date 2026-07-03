@@ -101,6 +101,7 @@ const closeButton = document.querySelector(".close");
 const switchButton = document.querySelector(".mswitch")
 const scrollToTopBtn = document.querySelector(".scrollToTopBtn")
 const scrollToTopWrapper = document.querySelector(".scrollToTopBtn-wrapper")
+const progressRing = document.querySelector(".reading-progress-ring")
 
 // 为各按钮添加事件监听器（如果元素存在）
 if (openButton) {
@@ -202,20 +203,35 @@ if (scrollToTopBtn) {
     });
 }
 
-// 滚动监听：控制回到顶部按钮的显示/隐藏
+// 滚动监听：控制回到顶部按钮的显示/隐藏 + 阅读进度更新
 const SCROLL_THRESHOLD = 500;
 let scrollTicking = false;
 
 function handleScrollVisibility() {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    if (!scrollToTopWrapper) return;
-    
-    if (scrollTop > SCROLL_THRESHOLD) {
-        scrollToTopWrapper.classList.add('is-visible');
-    } else {
-        scrollToTopWrapper.classList.remove('is-visible');
+    if (scrollToTopWrapper) {
+        if (scrollTop > SCROLL_THRESHOLD) {
+            scrollToTopWrapper.classList.add('is-visible');
+        } else {
+            scrollToTopWrapper.classList.remove('is-visible');
+        }
     }
+    updateReadingProgress();
     scrollTicking = false;
+}
+
+// 计算并更新阅读进度环
+function updateReadingProgress() {
+    if (!progressRing) return;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight;
+    const maxScroll = scrollHeight - clientHeight;
+    // 限制在 [0, 1]，避免 overscroll 导致进度环出现伪影
+    const progress = maxScroll > 0
+        ? Math.max(0, Math.min(scrollTop / maxScroll, 1))
+        : 1;
+    progressRing.style.setProperty('--progress', (progress * 360) + 'deg');
 }
 
 window.addEventListener('scroll', function() {
@@ -1010,6 +1026,12 @@ function reinitializeAfterPjax() {
             });
         });
     }
+
+    // PJAX 切换页面后，重新计算阅读进度（页面高度变化、滚动位置已重置）
+    // 延迟一帧执行，确保新内容已渲染、布局已稳定
+    requestAnimationFrame(function() {
+        updateReadingProgress();
+    });
 
     // 重新初始化代码高亮（Prism hook 会自动设置 data-language）
     if (typeof Prism !== 'undefined') {

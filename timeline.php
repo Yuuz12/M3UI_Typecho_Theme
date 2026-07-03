@@ -526,7 +526,12 @@ $tagCount = count($tags);
     }
 
     .ct-category-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    .ct-category-card {
+        padding: 14px 16px;
     }
 
     .ct-section-title {
@@ -569,14 +574,31 @@ $tagCount = count($tags);
         margin-bottom: 32px;
     }
 
+    .ct-category-card {
+        padding: 12px;
+    }
+
+    .ct-category-icon {
+        font-size: 18px;
+    }
+
+    .ct-category-name {
+        font-size: 14px;
+    }
+
+    .ct-category-count {
+        font-size: 12px;
+        padding: 2px 6px;
+    }
+
     .timeline-year {
         margin-bottom: 32px;
     }
-    
+
     .timeline-year-title {
         font-size: 18px;
     }
-    
+
     .timeline-month-title {
         font-size: 14px;
     }

@@ -1703,17 +1703,31 @@ body.spotlight-open {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: 0;
     padding: 16px 0;
     text-align: center;
     font-size: 14px;
     color: rgb(var(--mdui-color-on-surface-variant));
 }
 
-.footer-content span {
+.footer-content > span {
     display: flex;
     align-items: center;
     gap: 4px;
+    padding: 0 16px;
+    position: relative;
+}
+
+.footer-content > span:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgb(var(--mdui-color-outline));
 }
 
 .footer-content a {
@@ -1737,7 +1751,15 @@ body.spotlight-open {
 @media screen and (max-width: 768px) {
     .footer-content {
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
+    }
+
+    .footer-content > span {
+        padding: 0;
+    }
+
+    .footer-content > span:not(:last-child)::after {
+        display: none;
     }
 }
 

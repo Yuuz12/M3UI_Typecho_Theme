@@ -368,9 +368,9 @@ function generateTableOfContents() {
             prevLevel = item.level;
         });
         
-        // 确保目录容器显示
+        // 确保目录容器显示（保持 flex 布局，否则 flex:1 的列表无法在容器内滚动）
         if (tocContainer) {
-            tocContainer.style.display = 'block';
+            tocContainer.style.display = 'flex';
         }
         
         // 移动端：将目录移到 post-meta-row 下方
@@ -510,6 +510,8 @@ function updateActiveTocItem(activeId) {
     const activeItem = document.querySelector(`#toc-content .item[data-target="${activeId}"]`);
     if (activeItem) {
         activeItem.classList.add('toc-active');
+        // 若选中项不在目录可见区域内，最小滚动使其可见（nearest 在已可见时不滚动）
+        activeItem.scrollIntoView({ block: 'nearest' });
     }
 }
 

@@ -178,20 +178,13 @@ function themeFields($layout)
     $layout->addItem($indexCardImage);
 }
 
-// 替换Gravatar头像为国内代理源
-function replaceGravatar($avatar)
-{
-    // 使用Cravatar（国内）作为Gravatar镜像源
-    $gravatar_proxy = 'https://cravatar.cn/avatar/';
-    
-    // 确保替换所有可能的Gravatar URL格式
-    $avatar = preg_replace('/(https?:\/\/)?(www|0|1|2|secure|cn)\.gravatar\.com\/avatar\//i', $gravatar_proxy, $avatar);
-    
-    return $avatar;
-}
-
-// 注册Gravatar替换钩子
-\Typecho\Plugin::factory('Widget_Abstract_Comments')->gravatar = 'replaceGravatar';
+// 头像源说明：
+// 本主题所有头像均通过 \Typecho\Common::gravatarUrl() 输出（components/comments.php、
+// components/list-template.php），该函数默认走国内镜像 https://gravatar.loli.net/avatar/，
+// 不经过 Widget_Abstract_Comments::gravatar 钩子。
+// 如需统一更换头像源（例如 cravatar.cn），在 config.inc.php 中定义
+// __TYPECHO_GRAVATAR_PREFIX__ 常量即可全局生效，无需在此注册钩子。
+// （旧的 replaceGravatar 钩子签名与实际回调参数不匹配，且永不触发，已移除。）
 
 // 编辑器样式卡片插入
 function mduiStyleCardsEditor($content)

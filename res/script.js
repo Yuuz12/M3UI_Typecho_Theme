@@ -510,8 +510,24 @@ function updateActiveTocItem(activeId) {
     const activeItem = document.querySelector(`#toc-content .item[data-target="${activeId}"]`);
     if (activeItem) {
         activeItem.classList.add('toc-active');
-        // 若选中项不在目录可见区域内，最小滚动使其可见（nearest 在已可见时不滚动）
-        activeItem.scrollIntoView({ block: 'nearest' });
+        // 仅滚动目录列表自身使选中项可见（不能使用 scrollIntoView：
+        // 它会同时滚动页面，sticky 目录移出视口时会把页面往回拽）
+        const list = document.getElementById('toc-content');
+        if (list) {
+            const listRect = list.getBoundingClientRect();
+            const itemRect = activeItem.getBoundingClientRect();
+            // 以 padding-box 边缘为对齐边界（而非边框盒），
+            // 避免首/末项在滚动极限时外描边被容器裁剪
+            const paddingTop = parseFloat(getComputedStyle(list).paddingTop) || 0;
+            const paddingBottom = parseFloat(getComputedStyle(list).paddingBottom) || 0;
+            const topBound = listRect.top + paddingTop;
+            const bottomBound = listRect.bottom - paddingBottom;
+            if (itemRect.top < topBound) {
+                list.scrollTop -= (topBound - itemRect.top);
+            } else if (itemRect.bottom > bottomBound) {
+                list.scrollTop += (itemRect.bottom - bottomBound);
+            }
+        }
     }
 }
 

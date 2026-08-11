@@ -18,7 +18,7 @@
                     <mdui-card clickable variant="elevated" class="post-card" href="<?php $this->permalink() ?>" itemscope itemtype="http://schema.org/BlogPosting">
                         <img class="img-invert" src="<?php echo getCoverImage($this, $this->options); ?>" alt="<?php $this->title() ?>" loading="lazy">
                         <div class="post-card-info">
-                            <span class="post-title" itemprop="name headline"><?php $this->title() ?></a></span>
+                            <span class="post-title" itemprop="name headline"><?php $this->title() ?></span>
                             <div class="post-meta-chips">
                                 <mdui-chip icon="person" disabled elevated><?php $this->author(); ?></mdui-chip>
                                 <mdui-chip icon="event" disabled elevated><?php $this->date('Y-m-d'); ?></mdui-chip>

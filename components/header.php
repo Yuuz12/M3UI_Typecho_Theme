@@ -28,32 +28,43 @@
         <?php if ($this->tags): ?>
             <meta name="keywords" content="<?php echo htmlspecialchars(implode(',', array_column($this->tags, 'name'))); ?>">
         <?php endif; ?>
-        <link rel="canonical" href="<?php $this->permalink(); ?>">
+        <!-- 注意：single 页面的 canonical 由 Typecho 核心 $this->header() 输出，此处不重复输出 -->
         <!-- Open Graph -->
         <meta property="og:title" content="<?php $this->title(); ?>">
         <meta property="og:description" content="<?php echo htmlspecialchars(mb_substr(strip_tags($this->content), 0, 150)); ?>">
         <meta property="og:url" content="<?php $this->permalink(); ?>">
         <meta property="og:type" content="article">
         <?php $coverImg = getCoverImage($this, $this->options); ?>
+        <?php $hasRealCover = (bool)preg_match('#^https?://#i', $coverImg); ?>
+        <?php if ($hasRealCover): ?>
         <meta property="og:image" content="<?php echo $coverImg; ?>">
+        <?php endif; ?>
         <meta property="og:site_name" content="<?php $this->options->title(); ?>">
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="<?php $this->title(); ?>">
+        <?php if ($hasRealCover): ?>
         <meta name="twitter:image" content="<?php echo $coverImg; ?>">
+        <?php endif; ?>
         <!-- JSON-LD -->
         <script type="application/ld+json">
-        <?php echo json_encode([
+        <?php
+        $jsonLd = [
             '@context' => 'https://schema.org',
             '@type' => 'BlogPosting',
             'headline' => $this->title(),
             'datePublished' => date('c', $this->created),
             'dateModified' => date('c', $this->modified),
             'author' => ['@type' => 'Person', 'name' => $this->author->screenName],
-            'image' => $coverImg,
             'url' => $this->permalink,
             'mainEntityOfPage' => $this->permalink
-        ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT); ?>
+        ];
+        // data URI 无法被搜索引擎/社交爬虫抓取，仅在存在真实图片 URL 时输出 image 字段
+        if ($hasRealCover) {
+            $jsonLd['image'] = $coverImg;
+        }
+        echo json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        ?>
         </script>
     <?php elseif ($this->is('index')): ?>
         <meta name="description" content="<?php $this->options->description(); ?>">
